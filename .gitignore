@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+*.tsbuildinfo
+
+# Audio crudo: los sonidos ahora se sintetizan con Web Audio y no hay assets.
+*.wav
+
+# Configuración local del editor/herramientas
+.claude

@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zoomer Linux Survival</title>
+<meta name="description" content="Curso interactivo de Linux en español. 31 lecciones, terminal de verdad, cero instalación." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<style>
+:root{
+  --negro:#08090b; --carbon:#101317; --humo:#1a1f25; --borde:#252c33;
+  --tinta:#e8ede9; --tenue:#8b968f;
+  --acido:#c8ff3d; --rosa:#ff4d8d; --cian:#3de0ff;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--negro);color:var(--tinta);
+  font-family:var(--display);line-height:1.5;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* Grano: una capa de ruido SVG encima de todo, sin bloquear clics. */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+.env{max-width:78rem;margin-inline:auto;padding-inline:clamp(1rem,4vw,2.5rem)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--acido);outline-offset:3px}
+
+/* ---------- marquesina ---------- */
+.marq{
+  --dir:-50%;
+  border-block:1px solid var(--borde);background:var(--carbon);
+  overflow:hidden;white-space:nowrap;padding-block:.65rem;
+}
+.marq--acido{background:var(--acido);border-color:var(--acido)}
+.marq--acido b{color:var(--negro)}
+.marq__pista{display:inline-block;animation:correr 26s linear infinite}
+.marq--rev .marq__pista{animation-direction:reverse}
+.marq b{
+  font-family:var(--mono);font-size:.8rem;font-weight:500;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--tenue);padding-inline:1.4rem;
+}
+.marq b span{color:var(--rosa)}
+@keyframes correr{to{transform:translateX(var(--dir))}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding-block:clamp(3rem,9vw,7rem) clamp(2rem,5vw,4rem);overflow:hidden}
+.hero::before{
+  content:'';position:absolute;inset:-20% -10% auto -10%;height:70%;
+  background:radial-gradient(60% 60% at 30% 0%,rgba(200,255,61,.13),transparent 70%),
+             radial-gradient(50% 50% at 80% 10%,rgba(255,77,141,.11),transparent 70%);
+  pointer-events:none;
+}
+.hero__grid{position:relative;display:grid;gap:clamp(2rem,4vw,3.5rem);grid-template-columns:1fr}
+@media(min-width:62rem){.hero__grid{grid-template-columns:1.05fr .95fr;align-items:center}}
+
+.chip{
+  display:inline-flex;align-items:center;gap:.55rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid var(--borde);border-radius:99px;padding:.4rem .85rem;color:var(--tenue);
+}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--acido);animation:latir 1.6s ease-in-out infinite}
+@keyframes latir{50%{opacity:.25}}
+
+h1{
+  font-size:clamp(3rem,12vw,8.5rem);font-weight:800;line-height:.83;
+  letter-spacing:-.045em;margin:1.5rem 0 0;text-wrap:balance;
+}
+h1 em{font-style:normal;display:block;color:var(--acido)}
+h1 .tach{position:relative;color:var(--tenue)}
+h1 .tach::after{
+  content:'';position:absolute;left:-2%;right:-2%;top:52%;height:.07em;background:var(--rosa);
+  transform:scaleX(0);transform-origin:left;animation:tachar .7s .8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes tachar{to{transform:scaleX(1)}}
+
+.bajada{max-width:34rem;margin:1.6rem 0 0;font-size:clamp(1rem,1.6vw,1.2rem);color:var(--tenue)}
+.bajada strong{color:var(--tinta);font-weight:700}
+
+.acciones{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2rem}
+.btn{
+  display:inline-block;font-family:var(--mono);font-size:.9rem;font-weight:600;
+  text-decoration:none;padding:.9rem 1.5rem;border:2px solid var(--acido);
+  background:var(--acido);color:var(--negro);
+  transition:transform .14s ease,box-shadow .14s ease;
+}
+.btn:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--rosa)}
+.btn--vacio{background:transparent;color:var(--tinta);border-color:var(--borde)}
+.btn--vacio:hover{border-color:var(--tinta);box-shadow:6px 6px 0 var(--borde)}
+
+/* ---------- terminal del hero ---------- */
+.term{
+  border:1px solid var(--borde);background:#05070a;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
+}
+.term__top{
+  display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;
+  border-bottom:1px solid var(--borde);
+}
+.term__top i{width:9px;height:9px;border-radius:50%;background:var(--borde)}
+.term__top span{margin-left:auto;font-family:var(--mono);font-size:.7rem;color:var(--tenue)}
+.term__cuerpo{
+  padding:1.1rem;font-family:var(--mono);font-size:clamp(.72rem,1.4vw,.85rem);
+  line-height:1.75;min-height:17rem;white-space:pre-wrap;
+}
+.term__cuerpo .p{color:var(--acido)}
+.term__cuerpo .ok{color:var(--cian)}
+.term__cuerpo .xp{color:var(--rosa);font-weight:600}
+.cursor{display:inline-block;width:.6em;height:1.05em;background:var(--acido);
+  vertical-align:-.16em;animation:parpadeo 1.05s steps(2) infinite}
+@keyframes parpadeo{50%{opacity:0}}
+
+/* ---------- secciones ---------- */
+section{padding-block:clamp(3.5rem,8vw,6.5rem)}
+.rotulo{
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--acido);margin:0 0 1rem;
+}
+h2{font-size:clamp(2rem,5.5vw,3.6rem);font-weight:800;letter-spacing:-.035em;line-height:.98;margin:0;text-wrap:balance}
+.parrafo{max-width:38rem;color:var(--tenue);font-size:1.05rem;margin-top:1.2rem}
+
+.cifras{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:3rem;background:var(--borde);border:1px solid var(--borde)}
+@media(min-width:48rem){.cifras{grid-template-columns:repeat(4,1fr)}}
+.cifra{background:var(--negro);padding:1.6rem 1.2rem}
+.cifra b{display:block;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.04em;line-height:1}
+.cifra span{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tenue)}
+.cifra:nth-child(2) b{color:var(--acido)}
+.cifra:nth-child(4) b{color:var(--rosa)}
+
+.modulos{display:grid;gap:1px;margin-top:3rem;background:var(--borde);border:1px solid var(--borde)}
+@media(min-width:52rem){.modulos{grid-template-columns:repeat(2,1fr)}}
+.mod{background:var(--negro);padding:1.8rem;transition:background .18s ease}
+.mod:hover{background:var(--carbon)}
+.mod__n{font-family:var(--mono);font-size:.72rem;color:var(--acido);letter-spacing:.16em}
+.mod h3{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin:.5rem 0 .7rem}
+.mod p{margin:0;color:var(--tenue);font-size:.95rem}
+.mod code{
+  font-family:var(--mono);font-size:.78rem;color:var(--cian);
+  background:var(--humo);padding:.12em .45em;border:1px solid var(--borde);
+}
+
+.escalafon{margin-top:3rem;border:1px solid var(--borde)}
+.rango{
+  display:flex;align-items:baseline;gap:1rem;padding:.95rem 1.3rem;
+  border-bottom:1px solid var(--borde);font-family:var(--mono);font-size:.9rem;
+}
+.rango:last-child{border-bottom:0}
+.rango b{font-size:1.05rem;font-weight:600;letter-spacing:.04em}
+.rango span{margin-left:auto;color:var(--tenue);font-size:.8rem}
+.rango--top{background:var(--acido);color:var(--negro)}
+.rango--top span{color:rgba(8,9,11,.65)}
+
+/* ---------- quien hizo esto ---------- */
+.autor{display:grid;gap:2rem;margin-top:3rem;grid-template-columns:1fr}
+@media(min-width:56rem){.autor{grid-template-columns:16rem 1fr;gap:3rem}}
+.ficha{
+  border:1px solid var(--borde);border-left:3px solid var(--acido);
+  padding:1.4rem;align-self:start;font-family:var(--mono);font-size:.82rem;
+}
+.ficha p{margin:0 0 .8rem;color:var(--tinta)}
+.ficha p:last-child{margin-bottom:0}
+.ficha span{
+  display:block;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tenue);margin-bottom:.15rem;
+}
+.carta{max-width:40rem}
+.carta p{margin:0 0 1.1rem;color:var(--tenue);font-size:1.05rem;line-height:1.65}
+.carta b{color:var(--tinta);font-weight:700}
+.carta em{color:var(--tinta);font-style:italic}
+.carta code{font-family:var(--mono);font-size:.85rem;color:var(--cian)}
+.carta__cierre{
+  border-left:2px solid var(--rosa);padding-left:1.1rem;margin-bottom:0;
+  color:var(--tinta);font-weight:700;font-size:1.15rem;
+}
+
+.cierre{text-align:center;border-top:1px solid var(--borde)}
+.cierre h2{font-size:clamp(2.4rem,9vw,6rem)}
+footer{
+  border-top:1px solid var(--borde);padding-block:2.5rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--tenue);
+}
+footer p{margin:.3rem 0}
+.pie{display:grid;gap:1.6rem;grid-template-columns:1fr}
+@media(min-width:40rem){.pie{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:64rem){.pie{grid-template-columns:repeat(4,1fr)}}
+.pie b{color:var(--tinta);font-weight:600}
+.pie__marca{color:var(--tinta);font-weight:600;letter-spacing:.04em}
+.pie__autor{color:var(--acido);font-weight:600}
+.pie__enlace{color:var(--tinta);text-decoration:none;border-bottom:1px solid var(--acido)}
+.pie__enlace:hover{color:var(--acido)}
+
+/* Revelado por scroll. Se esconde SOLO si el JS arranco y puso .js en el elemento raiz:
+   si el script falla o no corre, la pagina se ve entera en vez de quedar en blanco. */
+.rev{transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+html.js .rev{opacity:0;transform:translateY(26px)}
+html.js .rev.visible{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rev{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+  h1 .tach::after{transform:scaleX(1)}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="env hero__grid">
+    <div>
+      <span class="chip"><i></i>en el navegador · sin instalar nada</span>
+      <h1><span class="tach">no sé</span> <em>usar la<br />terminal</em></h1>
+      <p class="bajada">
+        Curso interactivo de Linux en español. <strong>31 lecciones</strong> con una terminal
+        de verdad que corre en tu navegador y corrige sola. Sin máquina virtual, sin dual boot,
+        sin romper nada.
+      </p>
+      <div class="acciones">
+        <a class="btn" href="#empezar">Empezar ahora</a>
+        <a class="btn btn--vacio" href="#que-es">Qué es esto</a>
+      </div>
+    </div>
+
+    <div class="term" aria-hidden="true">
+      <div class="term__top"><i></i><i></i><i></i><span>alumno@so2-lab</span></div>
+      <div class="term__cuerpo" id="demo"></div>
+    </div>
+  </div>
+</header>
+
+<div class="marq marq--acido"><div class="marq__pista">
+  <b>ls</b><b>cd</b><b>pwd</b><b>mkdir</b><b>chmod</b><b>grep</b><b>kill</b><b>ps</b><b>find</b><b>cat</b><b>mv</b><b>rm</b><b>cp</b><b>man</b><b>wc</b><b>sort</b><b>du</b><b>df</b>
+  <b>ls</b><b>cd</b><b>pwd</b><b>mkdir</b><b>chmod</b><b>grep</b><b>kill</b><b>ps</b><b>find</b><b>cat</b><b>mv</b><b>rm</b><b>cp</b><b>man</b><b>wc</b><b>sort</b><b>du</b><b>df</b>
+</div></div>
+
+<section id="que-es">
+  <div class="env">
+    <p class="rotulo rev">01 — qué es</p>
+    <h2 class="rev">Una terminal que<br />te corrige sola.</h2>
+    <p class="parrafo rev">
+      Cada lección te da una consigna y te suelta en una terminal simulada. Escribís los comandos
+      de verdad, con rutas, permisos, comodines y tuberías. Cuando el sistema de archivos queda
+      como pedía la consigna, la misión se marca sola. Nadie te pide que copies y pegues.
+    </p>
+
+    <div class="cifras rev">
+      <div class="cifra"><b>4</b><span>módulos</span></div>
+      <div class="cifra"><b>31</b><span>lecciones</span></div>
+      <div class="cifra"><b>37</b><span>comandos</span></div>
+      <div class="cifra"><b>0</b><span>instalación</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="marq marq--rev"><div class="marq__pista">
+  <b>tab <span>autocompleta</span></b><b>flechas <span>historial</span></b><b>man <span>en español</span></b><b>pipes <span>de verdad</span></b><b>permisos <span>octales</span></b><b>procesos <span>y kill</span></b>
+  <b>tab <span>autocompleta</span></b><b>flechas <span>historial</span></b><b>man <span>en español</span></b><b>pipes <span>de verdad</span></b><b>permisos <span>octales</span></b><b>procesos <span>y kill</span></b>
+</div></div>
+
+<section>
+  <div class="env">
+    <p class="rotulo rev">02 — el recorrido</p>
+    <h2 class="rev">Cuatro módulos.<br />De cero a root.</h2>
+
+    <div class="modulos rev">
+      <article class="mod">
+        <p class="mod__n">MÓDULO 1 · 7 lecciones</p>
+        <h3>El sistema de archivos</h3>
+        <p>Dónde estás parado y cómo moverte. La raíz, el árbol, las rutas.</p>
+        <p style="margin-top:.9rem"><code>ls</code> <code>cd</code> <code>pwd</code> <code>mkdir</code> <code>mv</code> <code>more</code></p>
+      </article>
+      <article class="mod">
+        <p class="mod__n">MÓDULO 2 · 8 lecciones</p>
+        <h3>Archivos, permisos y grupos</h3>
+        <p>Copiar, borrar y quién puede hacer qué. Acá aparece <code>chmod</code>.</p>
+        <p style="margin-top:.9rem"><code>cp</code> <code>rm</code> <code>rmdir</code> <code>chmod</code> <code>groups</code> <code>*</code></p>
+      </article>
+      <article class="mod">
+        <p class="mod__n">MÓDULO 3 · 9 lecciones</p>
+        <h3>Diagnóstico y búsqueda</h3>
+        <p>Leer el manual, encontrar archivos y desviar la salida a donde quieras.</p>
+        <p style="margin-top:.9rem"><code>man</code> <code>find</code> <code>cat</code> <code>&gt;</code> <code>&gt;&gt;</code> <code>whoami</code></p>
+      </article>
+      <article class="mod">
+        <p class="mod__n">MÓDULO 4 · 7 lecciones</p>
+        <h3>Procesos, disco y tuberías</h3>
+        <p>Encadenar comandos chicos para resolver lo que ninguno resuelve solo.</p>
+        <p style="margin-top:.9rem"><code>ps</code> <code>kill</code> <code>du</code> <code>df</code> <code>grep</code> <code>|</code></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="env">
+    <p class="rotulo rev">03 — el pase</p>
+    <h2 class="rev">Juntás XP.<br />Te ganás el <span style="color:var(--acido)">#</span></h2>
+    <p class="parrafo rev">
+      Cada lección suma puntos, y más si la resolvés sin abrir la pista. Los puntos desbloquean
+      cosas para tunear la terminal: temas, cursores, scanlines de monitor viejo. Todo cosmético
+      — nadie queda con menos curso por ir más lento.
+      El pase se consulta escribiendo <code style="font-family:var(--mono);color:var(--cian)">pase</code>
+      en la terminal, porque claro que sí.
+    </p>
+
+    <div class="escalafon rev">
+      <div class="rango"><b>NOVATO</b><span>0 XP</span></div>
+      <div class="rango"><b>BECARIO</b><span>500 XP</span></div>
+      <div class="rango"><b>OPERADOR</b><span>1.200 XP</span></div>
+      <div class="rango"><b>TÉCNICO</b><span>2.000 XP</span></div>
+      <div class="rango"><b>ADMINISTRADOR</b><span>3.000 XP</span></div>
+      <div class="rango"><b>SYSADMIN</b><span>4.200 XP</span></div>
+      <div class="rango rango--top"><b>ROOT</b><span>5.400 XP · el prompt pasa de $ a #</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="quien">
+  <div class="env">
+    <p class="rotulo rev">04 — quién hizo esto</p>
+    <h2 class="rev">Un ayudante de cátedra<br />cansado de perder gente<br />en el módulo 2.</h2>
+
+    <div class="autor rev">
+      <aside class="ficha">
+        <p><span>quién</span> Natan Yona</p>
+        <p><span>rol</span> Ayudante de cátedra</p>
+        <p><span>materia</span> Sistemas Operativos II</p>
+        <p><span>año</span> 2026</p>
+      </aside>
+
+      <div class="carta">
+        <p>
+          Todos los años les damos <b>Linux Survival</b>. Es el material con el que
+          aprendió a moverse en una terminal media generación de estudiantes, y sigue
+          siendo excelente en lo que hace. El problema nunca fue el contenido.
+        </p>
+        <p>
+          Está en inglés. Y yo veía lo mismo cada cuatrimestre: el que ya sabía inglés
+          avanzaba tranquilo, y el resto abandonaba cerca del módulo 2 — no porque
+          <code>chmod</code> fuera difícil, sino porque <em>entender la consigna</em>
+          ya era el ejercicio. Se les iba la energía traduciendo en vez de practicando.
+        </p>
+        <p>
+          Así que escribí éste. Mismo recorrido temático, el mismo orden con el que se
+          enseña la línea de comandos desde siempre, pero con cada palabra redactada de
+          cero en español, una terminal que corrige sola contra el sistema de archivos,
+          y un poco de recompensa para que abrir el módulo 3 un martes a la noche no
+          dependa únicamente de la fuerza de voluntad.
+        </p>
+        <p class="carta__cierre">
+          No viene a reemplazar nada. Viene a que nadie se quede afuera por el idioma.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cierre" id="empezar">
+  <div class="env">
+    <p class="rotulo rev">05 — dale</p>
+    <h2 class="rev">Abrí la<br />terminal.</h2>
+    <p class="parrafo rev" style="margin-inline:auto">
+      Gratis, en español, sin cuenta y sin instalar nada. Cerrás la pestaña y el progreso
+      te queda guardado en el navegador.
+    </p>
+    <div class="acciones rev" style="justify-content:center">
+      <a class="btn" href="https://claude.ai/code/artifact/2907b29e-d5d1-4796-842e-d217fee8fb43">Entrar al curso</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="env pie">
+    <div>
+      <p class="pie__marca">Zoomer Linux Survival</p>
+      <p>Sistemas Operativos II</p>
+    </div>
+    <div>
+      <p class="pie__autor">por Natan Yona</p>
+      <p>© 2026 · Todos los derechos reservados</p>
+    </div>
+    <div>
+      <p>Código bajo <b>AGPL-3.0</b></p>
+      <p>Contenido bajo <b>CC BY-NC-SA 4.0</b></p>
+    </div>
+    <div>
+      <p><a class="pie__enlace" href="https://github.com/NatanYona/Zoomer-Linux-Survival">Ver el código</a></p>
+      <p>Texto, lecciones y sonidos originales</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var lento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Recien aca escondemos lo que se va a revelar: si este script no llegara a
+     correr, todo queda visible. */
+  if(!lento && 'IntersectionObserver' in window) document.documentElement.classList.add('js');
+
+  /* Revelado por scroll */
+  var obs = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold:.15 });
+  document.querySelectorAll('.rev').forEach(function(el,i){
+    el.style.transitionDelay = Math.min(i*60,240) + 'ms';
+    obs.observe(el);
+  });
+
+  /* Terminal del hero: se escribe sola */
+  var guion = [
+    { t:'pwd', s:'/home/alumno' },
+    { t:'ls -a', s:'.perfil  descargas  documentos  practica  proyecto' },
+    { t:'grep ERROR /var/log/sistema.log | wc -l', s:'3' },
+    { t:'chmod 754 practica/saludo.sh', s:'', ok:'Misión cumplida.', xp:'+150 XP' }
+  ];
+  var caja = document.getElementById('demo');
+  if(!caja) return;
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  if(lento){
+    caja.innerHTML = guion.map(function(l){
+      return '<span class="p">~$</span> ' + esc(l.t) + (l.s ? '\n' + esc(l.s) : '')
+        + (l.ok ? '\n<span class="ok">' + l.ok + '</span>  <span class="xp">' + l.xp + '</span>' : '');
+    }).join('\n');
+    return;
+  }
+
+  var hecho = '', i = 0, j = 0;
+  function paso(){
+    if(i >= guion.length){
+      setTimeout(function(){ hecho=''; i=0; j=0; paso(); }, 3200);
+      return;
+    }
+    var l = guion[i];
+    if(j <= l.t.length){
+      caja.innerHTML = hecho + '<span class="p">~$</span> ' + esc(l.t.slice(0,j)) + '<span class="cursor"></span>';
+      j++;
+      setTimeout(paso, 42);
+    } else {
+      hecho += '<span class="p">~$</span> ' + esc(l.t) + '\n';
+      if(l.s) hecho += esc(l.s) + '\n';
+      if(l.ok) hecho += '<span class="ok">' + l.ok + '</span>  <span class="xp">' + l.xp + '</span>\n';
+      caja.innerHTML = hecho + '<span class="cursor"></span>';
+      i++; j = 0;
+      setTimeout(paso, 620);
+    }
+  }
+  paso();
+})();
+</script>
+
+</body>
+</html>

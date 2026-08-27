@@ -1,0 +1,356 @@
+/* Layout. Todo color sale de tokens.css. */
+
+.app { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+
+/* ---------- barra superior ---------- */
+.rail {
+  display: flex; align-items: stretch; gap: var(--sp-5);
+  padding: 0 var(--sp-5);
+  background: var(--fondo-elev);
+  border-bottom: 1px solid var(--borde);
+}
+
+.marca {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--sp-3) var(--sp-5) var(--sp-3) 0;
+  border-right: 1px solid var(--borde);
+}
+.marca b { font-size: var(--esc-sm); font-weight: 600; }
+.marca span {
+  font-family: var(--tipo-mono); font-size: var(--esc-xs);
+  color: var(--texto-tenue); letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+.modulos { display: flex; flex: 1; }
+
+.tab {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) - 2px);
+  border-bottom: 2px solid transparent;
+  display: flex; flex-direction: column; gap: 2px; align-items: flex-start;
+  font-family: inherit; color: var(--texto-suave);
+  transition: color 0.12s, border-color 0.12s;
+}
+.tab:hover { color: var(--texto); }
+.tab[aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento-vivo); }
+.tab b { font-size: var(--esc-sm); font-weight: 600; }
+.tab span {
+  font-family: var(--tipo-mono); font-size: var(--esc-xs);
+  color: var(--texto-tenue); font-variant-numeric: tabular-nums;
+}
+.tab[data-completo="si"] span { color: var(--exito); }
+
+.ajustes { display: flex; align-items: center; gap: var(--sp-2); align-self: center; }
+
+/* Control nativo. accent-color lo tiñe con la paleta en una linea, sin
+   reconstruir riel y pulgar a mano. */
+.volumen {
+  inline-size: 5.5rem;
+  accent-color: var(--acento-vivo);
+  cursor: pointer;
+}
+.volumen:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.tema[aria-pressed='true'] { border-color: var(--acento); color: var(--acento); }
+
+.tema {
+  appearance: none; align-self: center; cursor: pointer;
+  background: none; border: 1px solid var(--borde); border-radius: var(--radio);
+  color: var(--texto-suave); padding: var(--sp-2) var(--sp-3);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs);
+}
+.tema:hover { border-color: var(--borde-fuerte); color: var(--texto); }
+
+/* ---------- cuerpo ---------- */
+.cuerpo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); min-height: 0; }
+
+.panel {
+  overflow-y: auto; padding: var(--sp-6) var(--sp-6) var(--sp-8);
+  border-right: 1px solid var(--borde);
+  display: flex; flex-direction: column; gap: var(--sp-5);
+}
+.panel > * { max-width: var(--medida); width: 100%; }
+
+.pasos { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.paso {
+  appearance: none; cursor: pointer; font-family: var(--tipo-mono);
+  font-size: var(--esc-xs); font-variant-numeric: tabular-nums;
+  width: 1.9rem; height: 1.9rem; display: grid; place-items: center;
+  border: 1px solid var(--borde-fuerte); border-radius: var(--radio);
+  background: transparent; color: var(--texto-tenue);
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.paso:hover { border-color: var(--acento); color: var(--texto); }
+.paso[data-estado="hecho"] { background: var(--exito-tenue); border-color: var(--exito); color: var(--exito); }
+.paso[data-estado="actual"] { border-color: var(--acento-vivo); border-width: 2px; color: var(--texto); font-weight: 600; }
+.paso[data-quiz="si"] { border-style: dashed; }
+
+.eyebrow {
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--acento);
+}
+.titulo { font-size: var(--esc-xl); font-weight: 600; letter-spacing: -0.015em; }
+
+.prosa { font-family: var(--tipo-prosa); font-size: var(--esc-md); line-height: 1.65; color: var(--texto-suave); }
+.prosa p { margin: 0 0 var(--sp-3); }
+.prosa p:last-child { margin-bottom: 0; }
+.prosa strong { color: var(--texto); font-weight: 600; }
+.prosa ul { margin: 0 0 var(--sp-3); padding-left: var(--sp-5); }
+
+code, .prosa code {
+  font-family: var(--tipo-mono); font-size: 0.88em;
+  background: var(--fondo-hundido); border: 1px solid var(--borde);
+  border-radius: var(--radio); padding: 0.1em 0.35em; color: var(--texto);
+}
+
+.consigna {
+  border-left: 3px solid var(--acento-vivo);
+  background: var(--acento-tenue);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 0 var(--radio-lg) var(--radio-lg) 0;
+}
+.consigna h3 {
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--acento); margin-bottom: var(--sp-2);
+}
+.consigna .prosa { color: var(--texto); font-size: var(--esc-base); }
+
+.bloque-cmd {
+  background: var(--term-fondo); border: 1px solid var(--term-borde);
+  border-radius: var(--radio-lg); padding: var(--sp-4); overflow-x: auto;
+}
+.bloque-cmd pre {
+  margin: 0; font-family: var(--tipo-mono); font-size: var(--esc-sm);
+  color: var(--term-texto); white-space: pre;
+}
+.bloque-cmd .comentario { color: var(--term-tenue); }
+
+details.pista { border-top: 1px solid var(--borde); padding-top: var(--sp-4); }
+details.pista summary {
+  cursor: pointer; font-size: var(--esc-sm); color: var(--texto-suave);
+  font-family: var(--tipo-mono);
+}
+details.pista summary::marker { color: var(--acento); }
+details.pista .prosa { margin-top: var(--sp-3); font-size: var(--esc-base); }
+
+.logro {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  background: var(--exito-tenue); border: 1px solid var(--exito);
+  border-radius: var(--radio-lg); padding: var(--sp-4) var(--sp-5);
+}
+.logro b { color: var(--exito); font-size: var(--esc-sm); }
+
+.acciones { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+.btn {
+  appearance: none; cursor: pointer; font-family: inherit;
+  font-size: var(--esc-sm); font-weight: 500;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radio);
+  border: 1px solid var(--borde-fuerte); background: var(--fondo-elev); color: var(--texto);
+  transition: border-color 0.12s, background 0.12s;
+}
+.btn:hover:not(:disabled) { border-color: var(--acento); }
+.btn--principal { background: var(--acento-vivo); border-color: var(--acento-vivo); color: #17130a; font-weight: 600; }
+.btn--principal:hover:not(:disabled) { filter: brightness(1.06); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- terminal ---------- */
+.term { background: var(--term-fondo); display: flex; flex-direction: column; min-height: 0; }
+.term__barra {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-2) var(--sp-4); border-bottom: 1px solid var(--term-borde);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); color: var(--term-tenue);
+}
+.term__barra .puntos { display: flex; gap: 6px; }
+.term__barra .puntos i { width: 9px; height: 9px; border-radius: 50%; background: var(--term-borde); }
+
+.term__scroll {
+  flex: 1; overflow-y: auto; padding: var(--sp-4);
+  font-family: var(--tipo-mono); font-size: var(--esc-sm); line-height: 1.55;
+  color: var(--term-texto); cursor: text;
+}
+.term__scroll pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.l-entrada { color: var(--term-texto); }
+.l-salida { color: var(--term-texto); opacity: 0.92; }
+.l-error { color: var(--term-error); }
+.l-logro { color: var(--term-prompt); font-weight: 600; }
+
+/* Ultima linea del historial, no una barra aparte: el prompt baja con cada
+   comando igual que en una terminal de verdad. */
+.term__linea { display: flex; gap: 0.5ch; align-items: baseline; }
+.term__linea .p {
+  color: var(--term-prompt); white-space: pre;
+  font-family: var(--tipo-mono); font-size: var(--esc-sm);
+}
+.term__linea input {
+  flex: 1; background: none; border: 0; outline: none; padding: 0;
+  font-family: var(--tipo-mono); font-size: var(--esc-sm);
+  color: var(--term-texto); caret-color: var(--term-acento);
+}
+.term__ayuda {
+  padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--term-borde);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); color: var(--term-tenue);
+}
+.term__ayuda code { background: none; border: 0; color: var(--term-acento); padding: 0; }
+
+/* ---------- cosmeticos del pase ---------- */
+/* El tema se aplica pisando las variables --term-* en .app desde React.
+   Lo de aca abajo es lo que no se puede expresar como variable. */
+
+/* caret-shape es reciente: donde no este soportado el cursor queda en barra,
+   que es el de fabrica. Degrada sin romper nada. */
+.app[data-cursor='cursor-bloque'] .term__linea input { caret-shape: block; }
+.app[data-cursor='cursor-guion'] .term__linea input { caret-shape: underscore; }
+
+.app[data-efecto='efecto-crt'] .term { position: relative; }
+.app[data-efecto='efecto-crt'] .term::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.22) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+/* ---------- quiz ---------- */
+.quiz { display: flex; flex-direction: column; gap: var(--sp-5); }
+.opciones { display: flex; flex-direction: column; gap: var(--sp-2); }
+.opcion {
+  appearance: none; cursor: pointer; text-align: left; font-family: inherit;
+  font-size: var(--esc-base);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radio-lg);
+  border: 1px solid var(--borde); background: var(--fondo-elev); color: var(--texto);
+  display: flex; gap: var(--sp-3); align-items: baseline;
+  transition: border-color 0.12s;
+}
+.opcion:hover:not(:disabled) { border-color: var(--acento); }
+.opcion .letra { font-family: var(--tipo-mono); font-size: var(--esc-xs); color: var(--texto-tenue); }
+.opcion[data-marca="bien"] { border-color: var(--exito); background: var(--exito-tenue); }
+.opcion[data-marca="mal"] { border-color: var(--error); background: var(--error-tenue); }
+.opcion:disabled { cursor: default; }
+
+.explicacion {
+  border-left: 3px solid var(--borde-fuerte); padding: var(--sp-3) var(--sp-4);
+  background: var(--fondo-hundido); border-radius: 0 var(--radio) var(--radio) 0;
+  font-size: var(--esc-sm); color: var(--texto-suave);
+}
+.puntaje { font-family: var(--tipo-mono); font-size: var(--esc-xxl); font-variant-numeric: tabular-nums; }
+
+/* ---------- aviso de mision cumplida ---------- */
+/* Usa la Popover API: el navegador lo pone en la capa superior, asi que no
+   empuja el layout del panel ni necesita z-index. */
+.aviso {
+  position: fixed;
+  inset: auto var(--sp-5) var(--sp-5) auto;
+  margin: 0;
+  /* Ancho fijo y pila vertical. La version anterior ponia texto y botones como
+     columnas que competian por el ancho: el pie se partia en cuatro lineas y el
+     boton terminaba encima del texto. */
+  inline-size: min(23rem, calc(100vw - 2 * var(--sp-5)));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  background: var(--fondo-elev);
+  color: var(--texto);
+  border: 1px solid var(--exito);
+  border-left: 3px solid var(--exito);
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra);
+  /* Visible por defecto: si la animacion no corre (pestaña en segundo plano,
+     reloj de animaciones congelado), el aviso igual se ve en vez de quedar
+     invisible. Sin fill-mode, la animacion solo decora la entrada. */
+  opacity: 1;
+}
+
+/* IMPRESCINDIBLE. El navegador oculta los popover cerrados con display:none,
+   pero esa regla es del origen UA y el display:flex de arriba, al ser de autor,
+   le gana. Sin esta linea el aviso queda fijo en pantalla para siempre. */
+.aviso:not(:popover-open) { display: none; }
+
+/* Entrada por animacion y no por transicion con @starting-style: la animacion
+   corre siempre que el elemento aparece, sin depender de que el navegador
+   interpole display/overlay de forma discreta.
+   ponytail: sin animacion de salida; el popover se oculta de golpe y alcanza. */
+.aviso:popover-open { animation: aviso-entra 0.22s ease; }
+
+@keyframes aviso-entra {
+  from { opacity: 0; translate: 0 0.75rem; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+.aviso__titulo {
+  margin: 0; display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-4);
+  /* Reserva para la × absoluta. Con --sp-4 el hueco quedaba en 3px y un XP de
+     cuatro digitos volvia a chocar contra el boton. */
+  padding-inline-end: var(--sp-6);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--exito);
+}
+.aviso__xp {
+  font-variant-numeric: tabular-nums; letter-spacing: 0;
+  font-size: var(--esc-sm); font-weight: 600; color: var(--acento);
+  animation: xp-entra 0.42s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes xp-entra {
+  from { scale: 0.4; opacity: 0; }
+  60%  { scale: 1.18; opacity: 1; }
+  to   { scale: 1; opacity: 1; }
+}
+
+.aviso__leccion { margin: 0; font-size: var(--esc-sm); color: var(--texto); }
+
+/* Barra de progreso al proximo rango. Se anima sola: el elemento persiste
+   entre avisos, asi que la transicion de ancho corre desde el valor viejo. */
+.aviso__barra {
+  block-size: 4px; inline-size: 100%;
+  background: var(--fondo-hundido); border-radius: 999px; overflow: hidden;
+}
+.aviso__barra i {
+  display: block; block-size: 100%;
+  background: var(--acento-vivo); border-radius: 999px;
+  transition: inline-size 0.7s cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+
+.aviso__pie {
+  margin: 0; display: flex; justify-content: space-between; gap: var(--sp-3);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); color: var(--texto-tenue);
+  font-variant-numeric: tabular-nums;
+}
+/* Una linea cada uno: si no entran, se recortan en vez de apilarse. */
+.aviso__pie span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aviso__pie span:first-child { color: var(--texto-suave); }
+
+.aviso__siguiente { align-self: flex-start; margin-block-start: var(--sp-1); }
+
+/* Subida de rango: mismo componente, otro peso visual. */
+.aviso[data-rango='si'] {
+  border-color: var(--acento-vivo);
+  border-left-width: 4px;
+  box-shadow: var(--sombra), 0 0 0 4px var(--acento-tenue);
+}
+.aviso[data-rango='si'] .aviso__titulo { color: var(--acento); }
+.aviso[data-rango='si'] .aviso__leccion {
+  font-family: var(--tipo-mono); font-size: var(--esc-lg); font-weight: 600;
+  letter-spacing: 0.02em; color: var(--acento-vivo); text-transform: lowercase;
+}
+
+/* Absoluta arriba a la derecha: asi no compite por el ancho con nada. */
+.aviso__cerrar {
+  position: absolute; inset-block-start: var(--sp-2); inset-inline-end: var(--sp-2);
+  appearance: none; cursor: pointer; background: none; border: 0;
+  color: var(--texto-tenue); font-size: var(--esc-lg); line-height: 1;
+  padding: 0 var(--sp-2);
+}
+.aviso__cerrar:hover { color: var(--texto); }
+
+@media (max-width: 900px) {
+  .app { height: auto; }
+  .cuerpo { grid-template-columns: 1fr; }
+  .panel { border-right: 0; border-bottom: 1px solid var(--borde); }
+  .term { min-height: 60vh; }
+  .rail { flex-wrap: wrap; gap: var(--sp-3); }
+}

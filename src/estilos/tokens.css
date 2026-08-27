@@ -1,0 +1,124 @@
+/* Sistema de diseno. Los componentes SOLO consumen variables de aca. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --tipo-ui: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --tipo-prosa: 'IBM Plex Serif', ui-serif, Georgia, serif;
+  --tipo-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  --esc-xs: 0.75rem;
+  --esc-sm: 0.875rem;
+  --esc-base: 1rem;
+  --esc-md: 1.125rem;
+  --esc-lg: 1.375rem;
+  --esc-xl: 1.75rem;
+  --esc-xxl: 2.25rem;
+
+  --sp-1: 0.25rem; --sp-2: 0.5rem;  --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem;  --sp-6: 2rem;    --sp-7: 3rem;    --sp-8: 4rem;
+
+  --radio: 3px;
+  --radio-lg: 6px;
+  --medida: 62ch;
+
+  /* Tema claro: neutros gris-verdosos, sesgados hacia el ambar del acento. */
+  --fondo: #f3f5f2;
+  --fondo-elev: #fbfcfa;
+  --fondo-hundido: #e8ebe6;
+  --borde: #d4d9d0;
+  --borde-fuerte: #b6bdb0;
+  --texto: #1b211d;
+  --texto-suave: #5c665e;
+  --texto-tenue: #838d85;
+
+  --acento: #a86a12;
+  --acento-vivo: #e39b2e;
+  --acento-tenue: #f5e9d4;
+  --exito: #2f7d4f;
+  --exito-tenue: #dff0e4;
+  --error: #b23b3b;
+  --error-tenue: #f7e2e2;
+
+  /* La terminal es oscura en los dos temas. Una terminal es oscura, siempre. */
+  --term-fondo: #0a0e11;
+  --term-borde: #1f272c;
+  --term-texto: #c6d3cb;
+  --term-tenue: #6f8078;
+  --term-prompt: #5fd08a;
+  --term-acento: #e39b2e;
+  --term-error: #de6b6b;
+
+  --sombra: 0 1px 2px rgba(20, 28, 22, 0.06), 0 4px 12px rgba(20, 28, 22, 0.05);
+}
+
+/* El default del visor no estampa nada: solo prefers-color-scheme separa claro de oscuro.
+   El guard :not([data-theme='light']) hace que una eleccion explicita de claro gane. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fondo: #11161a;
+    --fondo-elev: #171d21;
+    --fondo-hundido: #0d1215;
+    --borde: #262e33;
+    --borde-fuerte: #3a444a;
+    --texto: #e2e8e3;
+    --texto-suave: #9aa69f;
+    --texto-tenue: #6e7a73;
+
+    --acento: #e39b2e;
+    --acento-vivo: #f2b155;
+    --acento-tenue: #2c2416;
+    --exito: #5fd08a;
+    --exito-tenue: #16281d;
+    --error: #de6b6b;
+    --error-tenue: #2a1818;
+
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3);
+  }
+}
+
+:root[data-theme='dark'] {
+  --fondo: #11161a;
+  --fondo-elev: #171d21;
+  --fondo-hundido: #0d1215;
+  --borde: #262e33;
+  --borde-fuerte: #3a444a;
+  --texto: #e2e8e3;
+  --texto-suave: #9aa69f;
+  --texto-tenue: #6e7a73;
+
+  --acento: #e39b2e;
+  --acento-vivo: #f2b155;
+  --acento-tenue: #2c2416;
+  --exito: #5fd08a;
+  --exito-tenue: #16281d;
+  --error: #de6b6b;
+  --error-tenue: #2a1818;
+
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--tipo-ui);
+  font-size: var(--esc-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--acento-vivo);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,82 @@
+Zoomer Linux Survival
+Copyright (c) 2026 Natan Yona. Todos los derechos reservados.
+
+Este repositorio contiene dos clases de obra, con condiciones distintas.
+
+
+================================================================================
+1. CÓDIGO  —  GNU Affero General Public License v3.0 o posterior
+================================================================================
+
+Alcance: todo el código fuente. En particular `src/motor/`, `src/ui/`,
+`pruebas/`, y los archivos de configuración del proyecto.
+
+Este programa es software libre: podés redistribuirlo y modificarlo bajo los
+términos de la GNU Affero General Public License publicada por la Free Software
+Foundation, en su versión 3 o cualquier versión posterior.
+
+Se distribuye con la esperanza de que sea útil, pero SIN NINGUNA GARANTÍA; ni
+siquiera la garantía implícita de COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO
+DETERMINADO. Consultá la licencia para más detalles.
+
+Texto completo: https://www.gnu.org/licenses/agpl-3.0.txt
+
+Por qué AGPL y no MIT: la cláusula de red obliga a que cualquiera que publique
+una versión modificada como servicio web también publique su código fuente. Sin
+eso, alguien puede tomar este curso, cambiarle el logo, cobrarlo, y no devolver
+nada.
+
+
+================================================================================
+2. CONTENIDO PEDAGÓGICO  —  CC BY-NC-SA 4.0
+================================================================================
+
+Alcance: las lecciones, consignas, pistas, cuestionarios, páginas de manual en
+español, textos del pase y de la landing. En particular `src/contenido/`,
+`src/motor/comandos/man-es.ts` y `landing/`.
+
+Obra bajo Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0
+Internacional.
+
+Sos libre de compartirla y adaptarla, bajo estas condiciones:
+
+  ATRIBUCIÓN      Tenés que dar crédito a Natan Yona, enlazar a la licencia e
+                  indicar si hiciste cambios.
+
+  NO COMERCIAL    No podés usar el material con fines comerciales.
+
+  COMPARTIR IGUAL Si lo remezclás o transformás, tenés que distribuir tu
+                  contribución bajo la misma licencia.
+
+Texto completo: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.es
+
+
+================================================================================
+QUÉ SIGNIFICA ESTO EN LA PRÁCTICA
+================================================================================
+
+PODÉS, sin pedir permiso:
+  - Usar el curso para estudiar.
+  - Usarlo para dar clase, en cualquier institución, citando la fuente.
+  - Traducirlo, adaptarlo o agregarle módulos, manteniendo estas condiciones.
+  - Alojar tu propia copia, publicando los cambios que le hagas al código.
+
+NO PODÉS:
+  - Venderlo, ni cobrar por el acceso, ni incluirlo en un producto pago.
+  - Quitar la atribución o presentarlo como obra propia.
+  - Publicar una versión modificada como servicio cerrado.
+
+Para usos comerciales, escribí y lo hablamos.
+
+
+================================================================================
+ADVERTENCIA HONESTA
+================================================================================
+
+Una licencia da recurso legal, no protección técnica. Cualquiera que pueda ver
+este repositorio puede copiar su contenido, con licencia o sin ella. Lo que
+cambia es que hacerlo sin respetar estas condiciones es una infracción, y eso
+te habilita a reclamar.
+
+Si lo que querés es que nadie acceda al material, la única medida efectiva es
+mantener el repositorio privado.
