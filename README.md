@@ -1,10 +1,34 @@
-# Zoomer Linux Survival
+<p align="center">
+  <img src="src/logo/zoomer-linux.jpg" alt="Ilustración estilo battlestation: monitores con terminales, pingüinos de Linux, latas de energizante y páginas de manual impresas" width="460" />
+</p>
 
-Curso interactivo de Linux en español, para la cátedra de **Sistemas Operativos II**.
+<h1 align="center">Zoomer Linux Survival</h1>
 
-31 lecciones repartidas en 4 módulos, con una terminal simulada que corre en el
-navegador y valida sola contra el sistema de archivos. Sin instalar nada, sin
-máquina virtual, sin cuenta.
+<p align="center">
+  <b>Curso interactivo de Linux en español</b><br />
+  Cátedra de Sistemas Operativos II
+</p>
+
+---
+
+## Qué tipo de proyecto es
+
+Una **aplicación web estática** que enseña a usar la línea de comandos de Linux
+practicando de verdad, no leyendo sobre el tema.
+
+No es un tutorial con capturas de pantalla ni un video. Es un **intérprete de
+comandos escrito desde cero** que corre entero en el navegador: tiene su propio
+sistema de archivos en memoria, con permisos, dueños y grupos. El alumno escribe
+`chmod 754 saludo.sh` y el archivo realmente cambia de modo. Cada lección se da
+por cumplida cuando el sistema de archivos queda como pedía la consigna, así que
+no hay forma de aprobar copiando y pegando sin entender.
+
+Nada de esto necesita servidor. No hay backend, no hay base de datos, no hay
+cuentas de usuario. El build produce **un único archivo HTML** que se sube a
+cualquier hosting estático, se reparte por pendrive o se abre con doble clic.
+
+Y sí, la ilustración es a propósito. El proyecto le habla a la persona que va a
+terminar armándose esa mesa.
 
 ---
 
