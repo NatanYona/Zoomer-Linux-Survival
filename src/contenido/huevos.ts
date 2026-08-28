@@ -4,6 +4,12 @@
 // consignas: hacen falta las lecciones MAS explorar. Quien nunca escribio
 // `ls -a` en un directorio que no le pidieron, no llega.
 //
+// TONO: no son mini-clases. Son casos REALES de la historia de la seguridad,
+// contados como chusmerio entre dos curiosos. Nada de moraleja al final: el
+// alumno y el que escribio esto son la misma clase de persona, la que abre
+// todas las puertas para ver que hay. Algunos se encadenan y apuntan al
+// siguiente, como en un CTF.
+//
 // Deteccion: cada huevo deja un token en su contenido. El store mira la salida
 // de cada comando y si aparece el token, lo cuenta. Sirve con cat, more, head,
 // tail, grep y tuberias, sin que el motor tenga que rastrear lecturas.
@@ -30,198 +36,251 @@ const marca = (id: string, xp: number): string =>
 export const HUEVOS: Huevo[] = [
   {
     id: 'alias',
-    nombre: 'El alias defensivo',
+    nombre: 'El virus con telefono',
     xp: 100,
     donde: '/home/alumno/.bashrc',
     contenido:
-      '# No toques esta linea. La puse despues del incidente.\n' +
-      "alias rm='rm -i'\n" +
+      'Alguien dejó su nombre acá adentro.\n' +
       '\n' +
-      '# El incidente fue un martes. Habia un espacio de mas.\n' +
-      '# El backup era de agosto. Estabamos en noviembre.\n' +
-      '# No vuelvo a hablar del tema.\n' +
+      'En 1986 dos hermanos de Lahore escribieron el primer virus para\n' +
+      'PC. Adentro del código pusieron sus nombres reales, la dirección\n' +
+      'del local y el teléfono. No fue un descuido: querían que los\n' +
+      'llamaran.\n' +
+      '\n' +
+      'Y los llamaron. Durante años. Gente de medio mundo marcando un\n' +
+      'número de Pakistán para putear a dos tipos que seguían atendiendo\n' +
+      'el teléfono del negocio como si nada.\n' +
+      '\n' +
+      'La empresa todavía existe.\n' +
+      '\n' +
+      'Yo también dejé algo mío en este archivo. No te voy a decir qué.\n' +
       marca('alias', 100),
   },
   {
     id: 'motd',
-    nombre: 'El mensaje del dia',
+    nombre: 'El accidente de Cornell',
     xp: 100,
     donde: '/etc/.motd',
     contenido:
-      '  BIENVENIDO AL SERVIDOR DEL LABORATORIO\n' +
+      '¿Y vos qué hacés en /etc? Nadie te mandó.\n' +
       '\n' +
-      '  Reglas:\n' +
-      '  1. No corras nada que hayas copiado sin leerlo.\n' +
-      '  2. Especialmente si termina en `| sudo bash`.\n' +
-      '  3. La regla 2 tambien aplica cuando tenes apuro.\n' +
-      '  4. Sobre todo cuando tenes apuro.\n' +
+      'Ya que estás. En 1988 un estudiante escribió un programa para\n' +
+      'medir cuán grande era internet. Contar máquinas, nada más.\n' +
       '\n' +
-      '  Si estas leyendo esto es porque escribiste ls -a en /etc,\n' +
-      '  cosa que nadie te pidio. Bien ahi.\n' +
+      'Se le escapó. Se reinfectaba a sí mismo una y otra vez hasta que\n' +
+      'las computadoras no podían hacer otra cosa. Se comió cerca del\n' +
+      '10% de la red en un día. En esa época eran unas seis mil\n' +
+      'máquinas, o sea: prácticamente toda internet.\n' +
+      '\n' +
+      'Fue el primero condenado por algo así. Hoy es profesor en el MIT.\n' +
+      '\n' +
+      'Moraleja: ninguna. Seguí revolviendo.\n' +
+      'Empezá por /bin, que ahí hay otra.\n' +
       marca('motd', 100),
   },
   {
     id: 'vim',
-    nombre: 'La salida',
+    nombre: 'Cicada',
     xp: 100,
     donde: '/usr/share/.como-salir',
     contenido:
-      'GUIA DE EMERGENCIA\n' +
+      'Viniste a buscar cómo salir de vim.\n' +
+      'Te vas a ir con otra cosa.\n' +
       '\n' +
-      'Si abriste vim y no sabes como salir:\n' +
+      'En 2012 apareció en internet un acertijo firmado por alguien que\n' +
+      'decía estar buscando gente muy inteligente. El que lo resolvía\n' +
+      'encontraba otro. Después vinieron imágenes con datos escondidos\n' +
+      'adentro, un libro que había que conseguir en papel, y coordenadas\n' +
+      'de carteles pegados en postes de ciudades de todo el mundo.\n' +
+      'Varsovia, Seúl, París, Sídney.\n' +
       '\n' +
-      '  Esc  :q!  Enter\n' +
+      'Nunca se supo quién lo armaba ni para qué reclutaban. Un día\n' +
+      'dejaron de publicar y no volvieron más.\n' +
       '\n' +
-      'Guardamos esto en un archivo oculto porque el 90% de la gente\n' +
-      'que lo necesita no sabe buscarlo, y el 10% que sabe buscarlo\n' +
-      'no lo necesita.\n' +
+      'Este archivo tampoco te va a dar lo que viniste a buscar.\n' +
       '\n' +
-      'Vos evidentemente estas en el segundo grupo. Tomate los puntos.\n' +
+      'Andá a mirar en /var/log. Hay algo con nombre de vergüenza.\n' +
+      '\n' +
+      '(Esc  :q!  Enter. Ahí tenés. Ahora andá.)\n' +
       marca('vim', 100),
   },
   {
     id: 'daemon',
-    nombre: 'El demonio de Maxwell',
+    nombre: 'Creeper y Reaper',
     xp: 120,
     donde: '/usr/share/.leyenda',
     contenido:
-      'POR QUE SE LLAMAN DEMONIOS\n' +
+      'Che, esto es de 1971. Antes que todo.\n' +
       '\n' +
-      'Los procesos que corren de fondo en Unix se llaman daemons, y no\n' +
-      'es por nada satanico. El nombre viene del demonio de Maxwell: un\n' +
-      'experimento mental de fisica del siglo XIX donde una criatura\n' +
-      'invisible separa moleculas rapidas de lentas, trabajando sin parar\n' +
-      'y sin que nadie la vea.\n' +
+      'Creeper fue el primer programa que se copiaba solo de una máquina\n' +
+      'a otra. No rompía nada. Llegaba, mostraba un cartelito desafiando\n' +
+      'a que lo atraparan, y seguía viaje.\n' +
       '\n' +
-      'Un proceso que trabaja de fondo, para siempre, sin que le prestes\n' +
-      'atencion. El nombre era perfecto y quedo.\n' +
+      'Alguien del mismo laboratorio se picó y escribió Reaper, cuyo\n' +
+      'único laburo era perseguir a Creeper por la red y borrarlo.\n' +
       '\n' +
-      'Ahora sabes algo que el 95% de la gente que usa Linux no sabe.\n' +
+      'O sea: el primer virus y el primer antivirus fueron dos\n' +
+      'compañeros de trabajo jodiéndose entre ellos.\n' +
+      '\n' +
+      'Toda la industria de la seguridad, miles de millones de dólares,\n' +
+      'está construida arriba de una gastada entre colegas.\n' +
       marca('daemon', 120),
   },
   {
     id: 'confianza',
-    nombre: 'Confiar en la confianza',
+    nombre: 'Medio segundo',
     xp: 150,
     donde: '/bin/.leeme',
     contenido:
-      'UNA PREGUNTA INCOMODA\n' +
+      'Llegaste a /bin. Bien.\n' +
       '\n' +
-      'Estas mirando /bin, donde viven los binarios que ejecutas todos\n' +
-      'los dias. Pregunta: como sabes que este `ls` hace lo que dice?\n' +
+      'En 2024 casi entran a todos lados al mismo tiempo.\n' +
       '\n' +
-      'Podrias leer su codigo fuente. Pero el compilador que lo compilo,\n' +
-      'como sabes que es honesto? Podrias leer el codigo del compilador.\n' +
-      'Pero ese codigo lo compilo otro compilador.\n' +
+      'Alguien apareció en un proyecto de compresión chiquito, de esos\n' +
+      'que mantiene una sola persona y que usa media internet sin\n' +
+      'saberlo. Se puso a colaborar. Durante tres años. Arregló bugs,\n' +
+      'contestó mails, ayudó, se ganó la confianza, hasta que le dieron\n' +
+      'permisos de mantenedor.\n' +
       '\n' +
-      'Ken Thompson dio una charla sobre esto en 1984 y arruino el sueno\n' +
-      'de mucha gente. La conclusion es que en algun punto de la cadena\n' +
-      'hay que confiar en alguien a quien nunca vas a poder auditar.\n' +
+      'Recién ahí metió la puerta trasera, escondida adentro de unos\n' +
+      'archivos de prueba que nadie mira.\n' +
       '\n' +
-      'Que tengas buenas noches.\n' +
+      'Lo agarraron porque un ingeniero notó que sus conexiones SSH\n' +
+      'tardaban medio segundo más de lo normal y le dio bronca.\n' +
+      '\n' +
+      'Medio segundo y un tipo insoportable. Eso nos salvó.\n' +
+      '\n' +
+      'Vos tardaste bastante más que eso en encontrar este archivo.\n' +
       marca('confianza', 150),
   },
   {
     id: 'sesion',
-    nombre: 'La sesion abierta',
+    nombre: 'Lecturas normales',
     xp: 150,
     donde: '/tmp/.sesion-hija',
     contenido:
-      'socket: /tmp/.s-9d4f21  (abierto)\n' +
-      'origen:  desconocido\n' +
-      'uptime:  1247 dias\n' +
+      'socket: /tmp/.s-9d4f21     estado: ABIERTO\n' +
+      'lecturas: NORMALES         alertas: NINGUNA\n' +
       '\n' +
-      '  > alguien dejo esta sesion abierta y se fue\n' +
-      '  > el proceso padre murio hace tres anios\n' +
-      '  > el hijo sigue corriendo, esperando ordenes\n' +
-      '  > que nadie va a darle\n' +
+      'Todo bien por acá. No hay nada raro. Podés seguir.\n' +
       '\n' +
-      '  > el sysadmin que lo levanto ya no trabaja aca\n' +
-      '  > nadie se anima a matarlo\n' +
-      '  > por las dudas\n' +
+      '.\n' +
+      '.\n' +
+      '.\n' +
       '\n' +
-      'Toda infraestructura tiene uno de estos. El tuyo tambien.\n' +
+      'En 2010 encontraron un programa metido en los controladores de\n' +
+      'una planta nuclear. Les cambiaba la velocidad a las\n' +
+      'centrifugadoras hasta romperlas físicamente, de a poco, durante\n' +
+      'meses.\n' +
+      '\n' +
+      'Lo bueno: mientras lo hacía, a los operadores les mostraba en\n' +
+      'pantalla los valores de siempre. Todo normal. Todo en orden.\n' +
+      '\n' +
+      'Tardaron muchísimo en aceptar que la pantalla mentía.\n' +
+      '\n' +
+      'Yo también te estoy mostrando lecturas normales.\n' +
       marca('sesion', 150),
   },
   {
     id: 'permisos',
-    nombre: 'El 777',
+    nombre: 'Minecraft contra internet',
     xp: 120,
     donde: '/var/log/.verguenza',
     contenido:
-      'REGISTRO DE INCIDENTES — seccion permisos\n' +
+      'Ay, no. Este no. Bueno, ya está.\n' +
       '\n' +
-      '  14/03  no andaba. le puse 777. anduvo.\n' +
-      '  15/03  seguia sin andar otra cosa. 777 tambien.\n' +
-      '  16/03  777 a todo /var por las dudas.\n' +
-      '  17/03  auditoria.\n' +
-      '  18/03  ya no trabajo aca.\n' +
+      'En 2016 unos pibes querían tirarle abajo los servidores de\n' +
+      'Minecraft a la competencia. Se armaron una red con cámaras de\n' +
+      'seguridad y routers hogareños a los que nadie les cambió nunca\n' +
+      'la contraseña de fábrica.\n' +
       '\n' +
-      'chmod 777 es la respuesta correcta a la pregunta equivocada.\n' +
-      'La pregunta correcta es: quien necesita esto y para que.\n' +
+      'Les funcionó demasiado bien. Terminaron volteando el DNS de\n' +
+      'medio Estados Unidos. Twitter, Netflix, Spotify, Reddit, todo\n' +
+      'abajo, un viernes entero.\n' +
+      '\n' +
+      'Por unos servidores de Minecraft.\n' +
+      '\n' +
+      'Una cámara recién enchufada a internet tardaba minutos en ser\n' +
+      'infectada. Minutos.\n' +
+      '\n' +
+      'Andá a cambiar la contraseña de tu router. Te espero.\n' +
       marca('permisos', 120),
   },
   {
     id: 'bifurcacion',
-    nombre: 'La bomba',
+    nombre: '376 bytes',
     xp: 130,
     donde: '/tmp/.no-ejecutar',
     contenido:
-      'Adentro de este archivo hay trece caracteres que, ejecutados en\n' +
-      'un shell real, hacen que la maquina deje de responder.\n' +
+      'El archivo se llama "no ejecutar" y lo abriste igual.\n' +
+      'Sos exactamente el público que esperaba.\n' +
       '\n' +
-      'No los vamos a escribir. Se llama bomba de bifurcacion: una\n' +
-      'funcion que se llama a si misma dos veces y manda cada copia al\n' +
-      'fondo. Duplicacion sin freno hasta que el sistema se queda sin\n' +
-      'lugar en la tabla de procesos.\n' +
+      'En 2003 apareció algo de 376 bytes. Trescientos setenta y seis.\n' +
+      'Entraba entero en un solo paquete de red. No escribía nada en\n' +
+      'disco: vivía en memoria y listo.\n' +
       '\n' +
-      'Lo interesante no es el truco. Es que trece caracteres alcancen\n' +
-      'para voltear una maquina, y que la defensa no sea tecnica sino\n' +
-      'administrativa: un limite por usuario que alguien tiene que\n' +
-      'acordarse de configurar.\n' +
+      'Se duplicaba cada ocho segundos y medio.\n' +
       '\n' +
-      'Casi nadie se acuerda.\n' +
+      'En quince minutos había recorrido el planeta. Se cayeron cajeros\n' +
+      'automáticos, se cayó un sistema de emergencias, se cayó el\n' +
+      'monitoreo de una central nuclear.\n' +
+      '\n' +
+      '376 bytes. Menos de lo que ocupa este párrafo que estás leyendo.\n' +
+      '\n' +
+      'No, no te lo voy a escribir acá.\n' +
       marca('bifurcacion', 130),
   },
   {
     id: 'valeria',
-    nombre: 'La nota de Valeria',
+    nombre: 'El adjunto',
     xp: 100,
     donde: '/home/valeria/.para-el-que-mire',
     contenido:
-      'Si estas leyendo esto es porque te metiste en el home de otro\n' +
-      'usuario a ver que habia. No te lo voy a reprochar: yo tambien\n' +
-      'lo hubiera hecho.\n' +
+      'Te vi entrar al home de otra persona.\n' +
       '\n' +
-      'Pero anotate esto, que es la unica leccion que importa de todo\n' +
-      'el modulo de permisos: pudiste entrar porque los permisos te\n' +
-      'dejaron. No porque estuviera bien.\n' +
+      'Mirá, en mayo del 2000 llegó a millones de casillas un mail con\n' +
+      'un archivo adjunto que prometía ser una carta de amor. Millones\n' +
+      'de personas hicieron doble clic sin pensarlo un segundo.\n' +
       '\n' +
-      'El dia que administres un servidor de verdad vas a estar del\n' +
-      'otro lado de esta decision.\n' +
+      'Se comió archivos, se reenvió solo a toda la libreta de\n' +
+      'contactos, y en diez días había dado la vuelta al mundo.\n' +
       '\n' +
-      '                                                      — V.\n' +
+      'Lo escribió un estudiante de Manila. Cuando lo encontraron no lo\n' +
+      'pudieron acusar de nada: en Filipinas todavía no existía ninguna\n' +
+      'ley que dijera que eso estaba mal.\n' +
+      '\n' +
+      'Zafó porque nadie se había puesto a escribir la ley todavía.\n' +
+      '\n' +
+      'Vos también estás abriendo cosas que no son tuyas.\n' +
+      'Por ahora también zafás.\n' +
+      '\n' +
+      '                                                          — V.\n' +
       marca('valeria', 100),
   },
   {
     id: 'nulo',
-    nombre: 'El agujero',
+    nombre: 'Diez dolares',
     xp: 130,
     donde: '/tmp/.dev-null',
     contenido:
-      'Todo lo que mandes a /dev/null desaparece. No se guarda en\n' +
-      'ningun lado, no se puede recuperar, no deja rastro. Es el unico\n' +
-      'lugar del sistema que funciona exactamente como promete.\n' +
+      'Ah, encontraste el agujero.\n' +
       '\n' +
-      'La gente lo usa para silenciar errores que no quiere ver:\n' +
+      'Todo lo que mandes a /dev/null desaparece. Sin papelera, sin\n' +
+      'registro, sin vuelta atrás.\n' +
       '\n' +
-      '  comando 2>/dev/null\n' +
+      'Hablando de vuelta atrás: en 2017 un ransomware encriptó\n' +
+      'hospitales enteros en Inglaterra en cuestión de horas.\n' +
+      'Operaciones suspendidas, ambulancias desviadas a otras ciudades.\n' +
       '\n' +
-      'Que es la version informatica de sacarle la lamparita al tablero\n' +
-      'del auto. El problema sigue ahi, pero ya no te molesta.\n' +
+      'Lo frenó un pibe de 22 años que estaba leyendo el código por\n' +
+      'curiosidad, vio que consultaba un dominio que no existía, y lo\n' +
+      'registró por diez dólares nada más que para ver qué pasaba.\n' +
       '\n' +
-      'Aviso: en algun momento de tu carrera vas a hacer esto en\n' +
-      'produccion. Ojala te acuerdes de este archivo.\n' +
+      'Era el botón de apagado. Todavía se discute si el autor lo puso\n' +
+      'a propósito o se le escapó.\n' +
+      '\n' +
+      'Diez dólares y curiosidad. Igual que vos, leyendo un archivo\n' +
+      'oculto en /tmp un martes cualquiera.\n' +
       marca('nulo', 130),
   },
 ];
