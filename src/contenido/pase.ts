@@ -242,7 +242,7 @@ export const RANGOS: Rango[] = [
   },
   {
     nivel: 7,
-    puntos: 5400,
+    puntos: 6200,
     nombre: 'root',
     lema: 'En Unix el # del prompt no es decoración: significa que el sistema es tuyo.',
     desbloquea: ['tema-matriz', 'prompt-root'],

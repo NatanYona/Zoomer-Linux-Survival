@@ -7,6 +7,7 @@ import { desequipar, equipar, leerPerfil } from '../perfil';
 import { COSMETICOS, RANGOS } from '../../contenido/pase';
 import type { Cosmetico, TipoCosmetico } from '../../contenido/pase';
 import { progresoRango } from '../../contenido/xp';
+import { HUEVOS } from '../../contenido/huevos';
 
 const ANCHO = 58;
 const TIPOS: TipoCosmetico[] = ['tema', 'prompt', 'efecto', 'cursor'];
@@ -54,6 +55,15 @@ function panel(): Resultado {
         : 'Llegaste al final del escalafon.'
     )
   );
+  const vistos = HUEVOS.filter((h) => p.hallazgos.includes(h.id));
+  cuerpo.push(fila(), filaDoble('HALLAZGOS', vistos.length + '/' + HUEVOS.length));
+  if (vistos.length) {
+    // Solo los encontrados. Listar los que faltan seria arruinarlos.
+    for (const h of vistos) cuerpo.push(filaDoble('  ' + h.nombre, '+' + h.xp + ' XP'));
+  } else {
+    cuerpo.push(fila('  Hay cosas escondidas. No te voy a decir donde.'));
+  }
+
   cuerpo.push(fila(), fila('EQUIPADO'));
 
   for (const t of TIPOS) {

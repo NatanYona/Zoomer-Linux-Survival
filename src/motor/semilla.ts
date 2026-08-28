@@ -1,6 +1,7 @@
 // CONTRATO COMPARTIDO: el mundo inicial. Las lecciones SOLO pueden referirse
 // a rutas que existan aca. Si necesitas un archivo nuevo, pediselo al orquestador.
 import type { Estado, NodoDir, Nodo } from './tipos';
+import { HUEVOS } from '../contenido/huevos';
 
 const d = (hijos: Record<string, Nodo>, modo = 0o755, duenio = 'alumno', grupo = 'alumnos'): NodoDir =>
   ({ tipo: 'dir', modo, duenio, grupo, hijos });
@@ -21,8 +22,31 @@ const LOG = [
   'WARN  espacio en disco por debajo del 20%',
 ].join('\n') + '\n';
 
+/**
+ * Deja un archivo en una ruta que ya existe en el arbol. Si el directorio no
+ * existe no crea nada: preferimos que un huevo mal ubicado falle en la prueba
+ * antes que inventar directorios que las lecciones no esperan.
+ */
+function plantar(raiz: NodoDir, ruta: string, contenido: string): void {
+  const segs = ruta.split('/').filter(Boolean);
+  const nombre = segs.pop();
+  if (!nombre) return;
+
+  let n: NodoDir = raiz;
+  for (const s of segs) {
+    const h: Nodo | undefined = n.hijos[s];
+    if (!h || h.tipo !== 'dir') return;
+    n = h;
+  }
+
+  // El dueño sale de donde vive el archivo, para que los permisos sean creibles.
+  const duenio = ruta.startsWith('/home/alumno') ? 'alumno' : ruta.startsWith('/home/valeria') ? 'valeria' : 'root';
+  const grupo = duenio === 'root' ? 'root' : 'alumnos';
+  n.hijos[nombre] = { tipo: 'arch', modo: 0o644, duenio, grupo, contenido };
+}
+
 export function semilla(): Estado {
-  return {
+  const estado: Estado = {
     usuario: 'alumno',
     grupos: ['alumnos', 'so2'],
     cwd: ['home', 'alumno'],
@@ -80,4 +104,8 @@ export function semilla(): Estado {
       }, 0o755, 'root', 'root'),
     }, 0o755, 'root', 'root'),
   };
+
+  for (const h of HUEVOS) plantar(estado.fs, h.donde, h.contenido);
+
+  return estado;
 }

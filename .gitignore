@@ -8,3 +8,6 @@ dist
 
 # Configuración local del editor/herramientas
 .claude
+
+# Guia de huevos: material de catedra, no va al repo
+SPOILERS.md

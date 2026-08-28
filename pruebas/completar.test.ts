@@ -42,10 +42,12 @@ describe('completar', () => {
   });
 
   it('ocultos excluidos salvo que el fragmento arranque con punto', () => {
-    // ~/alumno solo tiene un oculto (.perfil): con '.' es candidato unico y se completa.
+    // ~/alumno tiene dos ocultos: .bashrc (un huevo de pascua) y .perfil.
+    // Con '.' son ambiguos, asi que lista candidatos y no completa nada.
     const conPunto = completar('cat .', semilla(), COMANDOS);
-    expect(conPunto.linea).toBe('cat .perfil ');
-    expect(conPunto.candidatos).toEqual([]);
+    expect(conPunto.candidatos).toContain('.perfil');
+    expect(conPunto.candidatos.length).toBeGreaterThan(1);
+    expect(conPunto.candidatos.every((c) => c.startsWith('.'))).toBe(true);
 
     const vacio = completar('cat ', semilla(), COMANDOS);
     expect(vacio.candidatos).not.toContain('.perfil');

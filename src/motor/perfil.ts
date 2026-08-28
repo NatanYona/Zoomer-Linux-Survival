@@ -10,6 +10,8 @@ export interface Perfil {
   xp: number;
   desbloqueados: string[];
   equipado: Record<TipoCosmetico, string>;
+  /** ids de huevos de pascua encontrados, para el listado del pase. */
+  hallazgos: string[];
 }
 
 export const EQUIPADO_DE_FABRICA: Record<TipoCosmetico, string> = {
@@ -23,6 +25,7 @@ let actual: Perfil = {
   xp: 0,
   desbloqueados: [],
   equipado: { ...EQUIPADO_DE_FABRICA },
+  hallazgos: [],
 };
 
 const oyentes = new Set<() => void>();

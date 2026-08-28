@@ -47,7 +47,9 @@ export function Aviso({ logro, progreso, onCerrar, onSiguiente, etiquetaSiguient
       </button>
 
       <p className="aviso__titulo">
-        <span>{subida ? 'Subiste de rango' : 'Misión cumplida'}</span>
+        <span>
+          {subida ? 'Subiste de rango' : logro?.clase === 'hallazgo' ? 'Hallazgo' : 'Misión cumplida'}
+        </span>
         {logro && <span className="aviso__xp">+{logro.xp}&nbsp;XP</span>}
       </p>
 

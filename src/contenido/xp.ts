@@ -6,6 +6,7 @@
 import { LECCIONES, QUIZZES } from './index';
 import { PUNTOS, RANGOS } from './pase';
 import type { Rango } from './pase';
+import { HUEVOS } from './huevos';
 
 export interface Progreso {
   completadas: Set<string>;
@@ -13,6 +14,8 @@ export interface Progreso {
   pistas: Set<string>;
   /** aciertos por modulo */
   quizzes: Record<string, number>;
+  /** ids de huevos de pascua encontrados. */
+  hallazgos: Set<string>;
 }
 
 /** Un quiz cuenta como aprobado desde el 70% de aciertos. */
@@ -38,6 +41,8 @@ export function calcularXp(p: Progreso): number {
     const todas = suyas.length > 0 && suyas.every((l) => p.completadas.has(l.id));
     if (todas && aprobo(m, p.quizzes)) xp += PUNTOS.moduloCompleto;
   }
+
+  for (const h of HUEVOS) if (p.hallazgos.has(h.id)) xp += h.xp;
 
   return xp;
 }
@@ -77,10 +82,27 @@ export function progresoRango(xp: number): ProgresoRango {
 export const desbloqueadosPor = (xp: number): string[] =>
   RANGOS.filter((r) => xp >= r.puntos).flatMap((r) => r.desbloquea);
 
-/** XP maximo alcanzable. Sirve para chequear que los umbrales sean alcanzables. */
+/** XP maximo alcanzable, incluidos los huevos. */
 export function xpMaximo(): number {
   const todas = new Set(LECCIONES.map((l) => l.id));
   const quizzes: Record<string, number> = {};
   for (const q of QUIZZES) quizzes[q.modulo] = q.preguntas.length;
-  return calcularXp({ completadas: todas, pistas: new Set(), quizzes });
+  return calcularXp({
+    completadas: todas,
+    pistas: new Set(),
+    quizzes,
+    hallazgos: new Set(HUEVOS.map((h) => h.id)),
+  });
+}
+
+/**
+ * XP maximo SIN explorar: solo cumpliendo consignas y cuestionarios.
+ * El rango mas alto tiene que quedar por encima de este numero, si no explorar
+ * es decorativo.
+ */
+export function xpSinExplorar(): number {
+  const todas = new Set(LECCIONES.map((l) => l.id));
+  const quizzes: Record<string, number> = {};
+  for (const q of QUIZZES) quizzes[q.modulo] = q.preguntas.length;
+  return calcularXp({ completadas: todas, pistas: new Set(), quizzes, hallazgos: new Set() });
 }

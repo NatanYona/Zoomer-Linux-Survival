@@ -95,7 +95,10 @@ describe('catalogo', () => {
     ponerXp(0);
     const s = correr('pase cosmeticos').salida;
     expect(s).toContain('tema-matriz');
-    expect(s).toContain('5.400 XP');
+    // Derivado del escalafon, no escrito a mano: ajustar el balance no debe
+    // romper esta prueba.
+    const root = RANGOS[RANGOS.length - 1];
+    expect(s).toContain(root.puntos.toLocaleString('es-AR') + ' XP');
   });
 
   it('lista todos los cosmeticos del catalogo', () => {

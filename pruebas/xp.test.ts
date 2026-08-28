@@ -6,12 +6,14 @@ import {
   progresoRango,
   desbloqueadosPor,
   xpMaximo,
+  xpSinExplorar,
   xpDeLeccion,
 } from '../src/contenido/xp';
 import { PUNTOS, RANGOS, COSMETICOS } from '../src/contenido/pase';
+import { HUEVOS, XP_HUEVOS_TOTAL, token } from '../src/contenido/huevos';
 import { LECCIONES, QUIZZES } from '../src/contenido';
 
-const vacio = { completadas: new Set<string>(), pistas: new Set<string>(), quizzes: {} };
+const vacio = { completadas: new Set<string>(), pistas: new Set<string>(), quizzes: {}, hallazgos: new Set<string>() };
 
 describe('calculo de XP', () => {
   it('arranca en cero', () => {
@@ -28,6 +30,7 @@ describe('calculo de XP', () => {
       completadas: new Set(['m1-l1']),
       pistas: new Set(['m1-l1']),
       quizzes: {},
+      hallazgos: new Set<string>(),
     });
     expect(xp).toBe(PUNTOS.leccion);
     expect(xp).toBeGreaterThan(0);
@@ -84,12 +87,33 @@ describe('rangos', () => {
 
 describe('el pase es alcanzable', () => {
   const techo = xpMaximo();
+  const ultimo = RANGOS[RANGOS.length - 1];
 
   it('el XP maximo alcanza para llegar a root', () => {
-    const ultimo = RANGOS[RANGOS.length - 1];
     expect(techo, 'techo real ' + techo + ' vs root en ' + ultimo.puntos).toBeGreaterThanOrEqual(
       ultimo.puntos
     );
+  });
+
+  // Decision de diseño, no accidente: el rango mas alto exige explorar.
+  it('cumplir TODAS las consignas no alcanza para root', () => {
+    const sinExplorar = xpSinExplorar();
+    expect(
+      sinExplorar,
+      'sin explorar se llega a ' + sinExplorar + ', y root pide ' + ultimo.puntos
+    ).toBeLessThan(ultimo.puntos);
+  });
+
+  it('quedan huevos de sobra para cubrir lo que falta', () => {
+    const falta = ultimo.puntos - xpSinExplorar();
+    expect(XP_HUEVOS_TOTAL, 'faltan ' + falta + ' XP y los huevos dan ' + XP_HUEVOS_TOTAL).toBeGreaterThan(
+      falta
+    );
+  });
+
+  it('cada huevo vive en una ruta distinta y tiene id unico', () => {
+    expect(new Set(HUEVOS.map((h) => h.id)).size).toBe(HUEVOS.length);
+    expect(new Set(HUEVOS.map((h) => h.donde)).size).toBe(HUEVOS.length);
   });
 
   it('completar todo desbloquea todos los cosmeticos', () => {
@@ -118,7 +142,12 @@ describe('xpDeLeccion', () => {
   it('coincide con lo que suma el calculo completo', () => {
     expect(xpDeLeccion(false)).toBe(calcularXp({ ...vacio, completadas: new Set(['m1-l1']) }));
     expect(xpDeLeccion(true)).toBe(
-      calcularXp({ completadas: new Set(['m1-l1']), pistas: new Set(['m1-l1']), quizzes: {} })
+      calcularXp({
+        completadas: new Set(['m1-l1']),
+        pistas: new Set(['m1-l1']),
+        quizzes: {},
+        hallazgos: new Set<string>(),
+      })
     );
   });
 });

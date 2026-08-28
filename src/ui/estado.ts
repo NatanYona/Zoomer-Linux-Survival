@@ -9,6 +9,7 @@ import type { Leccion } from '../contenido/esquema';
 import { calcularXp, desbloqueadosPor, progresoRango, rangoDe, xpDeLeccion } from '../contenido/xp';
 import { escribirPerfil, leerPerfil, suscribirPerfil } from '../motor/perfil';
 import { COSMETICOS } from '../contenido/pase';
+import { HUEVOS, token } from '../contenido/huevos';
 import { BANNER, bannerRango } from '../motor/comandos/pase';
 import { sonarMision, sonarRango } from './sonido';
 
@@ -27,9 +28,11 @@ interface Guardado {
   ultima: number;
   /** Lecciones en las que el alumno abrio la pista. Sirve para el bonus de puntos. */
   pistas: string[];
+  /** Huevos de pascua encontrados. */
+  hallazgos: string[];
 }
 
-const VACIO: Guardado = { completadas: [], quizzes: {}, ultima: 0, pistas: [] };
+const VACIO: Guardado = { completadas: [], quizzes: {}, ultima: 0, pistas: [], hallazgos: [] };
 
 function cargar(): Guardado {
   try {
@@ -50,8 +53,10 @@ export interface Logro {
   xp: number;
   /** XP total previo, para animar la barra desde el valor viejo. */
   xpPrevio: number;
-  /** Nombre del rango nuevo si esta leccion hizo subir de nivel. */
+  /** Nombre del rango nuevo si esto hizo subir de nivel. */
   subioA: string | null;
+  /** De donde vino el XP. Cambia el encabezado del aviso. */
+  clase: 'leccion' | 'hallazgo';
 }
 
 export function useCurso() {
@@ -62,31 +67,41 @@ export function useCurso() {
   const [completadas, setCompletadas] = useState<Set<string>>(new Set(inicial.completadas));
   const [quizzes, setQuizzes] = useState<Record<string, number>>(inicial.quizzes);
   const [pistas, setPistas] = useState<Set<string>>(new Set(inicial.pistas));
+  const [hallazgos, setHallazgos] = useState<Set<string>>(new Set(inicial.hallazgos));
   const [logro, setLogro] = useState<Logro | null>(null);
 
   const leccion: Leccion = LECCIONES[indice];
   const cumplida = completadas.has(leccion.id);
 
-  const xp = useMemo(() => calcularXp({ completadas, pistas, quizzes }), [completadas, pistas, quizzes]);
+  const xp = useMemo(
+    () => calcularXp({ completadas, pistas, quizzes, hallazgos }),
+    [completadas, pistas, quizzes, hallazgos]
+  );
   const progreso = useMemo(() => progresoRango(xp), [xp]);
 
   // El perfil vive fuera de React porque lo lee el comando `pase` desde el
   // motor. Acá lo mantenemos al día; lo equipado se suscribe al revés.
   const perfil = useSyncExternalStore(suscribirPerfil, leerPerfil);
   useEffect(() => {
-    escribirPerfil({ xp, desbloqueados: desbloqueadosPor(xp) });
+    escribirPerfil({ xp, desbloqueados: desbloqueadosPor(xp), hallazgos: [...hallazgos] });
   }, [xp]);
 
   useEffect(() => {
     try {
       localStorage.setItem(
         CLAVE,
-        JSON.stringify({ completadas: [...completadas], quizzes, ultima: indice, pistas: [...pistas] })
+        JSON.stringify({
+          completadas: [...completadas],
+          quizzes,
+          ultima: indice,
+          pistas: [...pistas],
+          hallazgos: [...hallazgos],
+        })
       );
     } catch {
       /* sin persistencia, la sesion sigue andando igual */
     }
-  }, [completadas, quizzes, indice, pistas]);
+  }, [completadas, quizzes, indice, pistas, hallazgos]);
 
   const efecto = perfil.equipado.efecto;
 
@@ -139,11 +154,38 @@ export function useCurso() {
         if (nuevas.length) setLineas((prev) => [...prev, ...nuevas]);
       }
 
+      // Huevos de pascua: alcanza con que el token aparezca en la salida, asi
+      // que funciona con cat, more, head, grep y tuberias por igual.
+      const nuevos = HUEVOS.filter((h) => !hallazgos.has(h.id) && r.salida.includes(token(h.id)));
+      let ganaHuevos = 0;
+
+      if (nuevos.length) {
+        ganaHuevos = nuevos.reduce((n, h) => n + h.xp, 0);
+        setHallazgos((prev) => {
+          const s = new Set(prev);
+          for (const h of nuevos) s.add(h.id);
+          return s;
+        });
+        setLineas((prev) => [
+          ...prev,
+          {
+            tipo: 'logro',
+            texto:
+              nuevos.length === 1
+                ? 'Hallazgo: ' + nuevos[0].nombre + '.  +' + ganaHuevos + ' XP'
+                : nuevos.length + ' hallazgos de una.  +' + ganaHuevos + ' XP',
+          },
+        ]);
+      }
+
+      // El XP de los huevos ya cuenta para decidir si esta linea sube de rango.
+      const base = xp + ganaHuevos;
+
       if (!completadas.has(leccion.id) && leccion.validar(motor.current)) {
         const gana = xpDeLeccion(pistas.has(leccion.id));
-        const subio = rangoDe(xp + gana).nivel > rangoDe(xp).nivel;
+        const subio = rangoDe(base + gana).nivel > rangoDe(xp).nivel;
+        const nuevoRango = rangoDe(base + gana);
 
-        const nuevoRango = rangoDe(xp + gana);
         setCompletadas((prev) => new Set(prev).add(leccion.id));
         setLineas((prev) => [
           ...prev,
@@ -154,18 +196,41 @@ export function useCurso() {
             : []),
         ]);
         setLogro({
+          clase: 'leccion',
           id: leccion.id,
           titulo: leccion.titulo,
-          xp: gana,
+          xp: gana + ganaHuevos,
           xpPrevio: xp,
-          subioA: subio ? rangoDe(xp + gana).nombre : null,
+          subioA: subio ? nuevoRango.nombre : null,
+        });
+
+        if (subio) sonarRango();
+        else sonarMision();
+      } else if (nuevos.length) {
+        // Solo hallazgo: el aviso le corresponde a el.
+        const subio = rangoDe(base).nivel > rangoDe(xp).nivel;
+        const nuevoRango = rangoDe(base);
+
+        if (subio) {
+          setLineas((prev) => [
+            ...prev,
+            { tipo: 'logro', texto: '\n' + bannerRango(nuevoRango.nombre, nuevoRango.lema) },
+          ]);
+        }
+        setLogro({
+          clase: 'hallazgo',
+          id: nuevos[0].id,
+          titulo: nuevos.length === 1 ? nuevos[0].nombre : nuevos.length + ' hallazgos de una',
+          xp: ganaHuevos,
+          xpPrevio: xp,
+          subioA: subio ? nuevoRango.nombre : null,
         });
 
         if (subio) sonarRango();
         else sonarMision();
       }
     },
-    [completadas, leccion, pistas, xp, armarPrompt]
+    [completadas, leccion, pistas, xp, hallazgos, armarPrompt]
   );
   /**
    * Completado con Tab. Devuelve la linea ya completada. Si hay ambiguedad,
@@ -210,6 +275,7 @@ export function useCurso() {
     xp,
     progreso,
     perfil,
+    hallazgos,
     completadas,
     quizzes,
     total: LECCIONES.length,
