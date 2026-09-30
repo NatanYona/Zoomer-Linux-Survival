@@ -164,6 +164,9 @@ describe('errores didacticos', () => {
   it('corchete sin espacio', () => {
     expect(correr('x=1; [ $x -eq 1]').error).toContain('falta el «]»');
   });
+  it('corchete pegado a la variable', () => {
+    expect(correr('x=1; [$x -eq 1 ]').error).toContain('después de [ va un espacio');
+  });
   it('texto donde va un numero', () => {
     expect(correr('[ veinte -ge 18 ]').error).toContain('se esperaba una expresión entera');
   });

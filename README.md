@@ -41,7 +41,7 @@ terminar armándose esa mesa.
 | Preguntas de cuestionario | 30 |
 | Comandos implementados | 43 |
 | Páginas de manual en español | 37 |
-| Pruebas automatizadas | 265 |
+| Pruebas automatizadas | 266 |
 
 Un intérprete de comandos propio: resolución de rutas, comodines, tuberías,
 redirección, permisos octales, tabla de procesos y cola de impresión. El
@@ -54,6 +54,9 @@ tubería y `crontab`. Los scripts se escriben en un `nano` simulado (Ctrl+O
 guarda, Ctrl+X sale) y se ejecutan con `./script.sh` respetando el permiso de
 ejecución. Un bucle infinito se corta solo en vez de colgar la página. La
 suite compara decenas de fragmentos contra la salida de bash real.
+
+Para quien da la clase: [guía del módulo 5](docs/guia-modulo-5.md), con la
+resolución paso a paso de cada lección y los errores más comunes.
 
 ## Cómo se usa
 
