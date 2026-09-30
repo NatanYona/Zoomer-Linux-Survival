@@ -1,10 +1,12 @@
 // CONTRATO COMPARTIDO. No modificar sin avisar al orquestador.
 import type { Estado } from '../motor/tipos';
 
+export type NumeroModulo = 1 | 2 | 3 | 4 | 5;
+
 export interface Leccion {
   /** 'm2-l5' */
   id: string;
-  modulo: 1 | 2 | 3 | 4;
+  modulo: NumeroModulo;
   /** Titulo corto, en sentence case. Sin numeracion: la UI la agrega. */
   titulo: string;
   /** Bloque conceptual. Markdown acotado: parrafos, `codigo`, **negrita**, listas con '- '. */
@@ -31,12 +33,12 @@ export interface Pregunta {
 }
 
 export interface Quiz {
-  modulo: 1 | 2 | 3 | 4;
+  modulo: NumeroModulo;
   preguntas: Pregunta[];
 }
 
 export interface Modulo {
-  numero: 1 | 2 | 3 | 4;
+  numero: NumeroModulo;
   titulo: string;
   /** 2-3 oraciones: que se lleva el alumno de este modulo. */
   introduccion: string;

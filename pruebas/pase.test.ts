@@ -39,16 +39,20 @@ describe('marco ASCII', () => {
 });
 
 describe('contenido del panel', () => {
+  // Los umbrales salen de RANGOS: si se rebalancea el pase, estas pruebas no se rompen.
+  const operador = RANGOS[2];
+  const tecnico = RANGOS[3];
+
   it('muestra el rango y el XP', () => {
-    ponerXp(1200);
+    ponerXp(operador.puntos);
     const s = correr('pase').salida;
-    expect(s).toContain('OPERADOR');
-    expect(s).toContain('1.200 XP');
+    expect(s).toContain(operador.nombre.toUpperCase());
+    expect(s).toContain(operador.puntos.toLocaleString('es-AR') + ' XP');
   });
 
   it('dice cuanto falta para el proximo rango', () => {
-    ponerXp(1200);
-    expect(correr('pase').salida).toContain('TÉCNICO');
+    ponerXp(operador.puntos);
+    expect(correr('pase').salida).toContain(tecnico.nombre.toUpperCase());
   });
 
   it('en el rango maximo no promete un siguiente', () => {
@@ -60,7 +64,7 @@ describe('contenido del panel', () => {
 
 describe('equipar', () => {
   it('equipa algo desbloqueado', () => {
-    ponerXp(500);
+    ponerXp(RANGOS[1].puntos);
     const r = correr('pase equipar tema-fosforo');
     expect(r.error).toBeUndefined();
     expect(leerPerfil().equipado.tema).toBe('tema-fosforo');

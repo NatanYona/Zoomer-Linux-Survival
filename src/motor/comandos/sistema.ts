@@ -6,11 +6,33 @@ import { buscar, buscarRuta, esDir, resolver } from '../vfs';
 import { MANUALES } from './man-es';
 
 // ---------- echo ----------
+// Las opciones van al principio, como en bash: -n (sin salto), -e (interpreta \n y \t).
 export const echo: Comando = (ctx) => {
-  const sinN = ctx.args.filter((a) => a !== '-n');
-  const conSalto = sinN.length === ctx.args.length;
-  return ok(sinN.join(' ') + (conSalto ? '\n' : ''));
+  let conSalto = true;
+  let escapes = false;
+  let i = 0;
+  while (i < ctx.args.length && /^-[neE]+$/.test(ctx.args[i])) {
+    for (const f of ctx.args[i].slice(1)) {
+      if (f === 'n') conSalto = false;
+      if (f === 'e') escapes = true;
+      if (f === 'E') escapes = false;
+    }
+    i++;
+  }
+  let texto = ctx.args.slice(i).join(' ');
+  if (escapes) {
+    const BS = String.fromCharCode(92);
+    texto = texto.replace(new RegExp(BS + BS + '([ntae' + BS + BS + '])', 'g'), (_, c: string) =>
+      c === 'n' ? '\n' : c === 't' ? '\t' : c === 'a' || c === 'e' ? '' : BS
+    );
+  }
+  return ok(texto + (conSalto ? '\n' : ''));
 };
+
+// ---------- sleep ----------
+// El simulador no espera de verdad: la terminal quedaria colgada.
+export const sleep: Comando = (ctx) =>
+  ctx.args.length && /^\d+(\.\d+)?s?$/.test(ctx.args[0]) ? ok() : falla('sleep: falta un número de segundos, ej: sleep 1');
 
 // ---------- whoami ----------
 export const whoami: Comando = (ctx) => ok(ctx.estado.usuario + '\n');
@@ -355,6 +377,9 @@ const AYUDA = [
   'Texto y busqueda:',
   '  echo grep sort wc',
   '',
+  'Scripts y tareas programadas:',
+  '  nano bash read test crontab sleep',
+  '',
   'Usuario y sistema:',
   '  whoami id groups who date du df history clear man help',
 ].join('\n');
@@ -382,4 +407,5 @@ export const registroSistema: Registro = {
   clear,
   man,
   help,
+  sleep,
 };

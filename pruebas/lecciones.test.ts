@@ -6,11 +6,11 @@ import { describe, it, expect } from 'vitest';
 import { ejecutar, nuevoEstado } from '../src/motor/motor';
 import { LECCIONES, MODULOS, QUIZZES, leccionesDe } from '../src/contenido';
 
-const ESPERADAS: Record<number, number> = { 1: 7, 2: 8, 3: 9, 4: 7 };
+const ESPERADAS: Record<number, number> = { 1: 7, 2: 8, 3: 9, 4: 7, 5: 9 };
 
 describe('estructura del curso', () => {
-  it('tiene los 4 modulos', () => {
-    expect(MODULOS.map((m) => m.numero)).toEqual([1, 2, 3, 4]);
+  it('tiene los 5 modulos', () => {
+    expect(MODULOS.map((m) => m.numero)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('tiene la cantidad de lecciones de cada modulo', () => {
@@ -33,8 +33,8 @@ describe('estructura del curso', () => {
     }
   });
 
-  it('tiene 4 quizzes con 6 preguntas y respuesta correcta en rango', () => {
-    expect(QUIZZES.length).toBe(4);
+  it('tiene un quiz por modulo, con 6 preguntas y respuesta correcta en rango', () => {
+    expect(QUIZZES.length).toBe(MODULOS.length);
     for (const q of QUIZZES) {
       expect(q.preguntas.length, 'quiz ' + q.modulo).toBe(6);
       for (const p of q.preguntas) {

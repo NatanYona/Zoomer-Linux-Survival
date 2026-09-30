@@ -84,6 +84,8 @@ export function semilla(): Estado {
           }),
           practica: d({
             'saludo.sh': f('#!/bin/bash\necho "hola desde el script"\n', 0o644),
+            // Lo programa la ultima leccion del modulo 5 con crontab.
+            'limpiar.sh': f('#!/bin/bash\n# Vacia la carpeta de temporales\necho "limpiando /tmp..."\n', 0o755),
           }),
           proyecto: d({
             src: d({ 'main.c': f('int main(void){return 0;}\n'), 'util.c': f('/* utilidades */\n') }),

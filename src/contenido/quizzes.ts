@@ -272,4 +272,66 @@ export const QUIZZES: Quiz[] = [
       },
     ],
   },
+  {
+    modulo: 5,
+    preguntas: [
+      {
+        enunciado: 'Ejecutás ./backup.sh y la terminal responde "Permiso denegado". ¿Qué le falta al archivo?',
+        opciones: [
+          'Tenés que ser root para ejecutar cualquier script',
+          'El permiso de ejecución: se arregla con chmod 755 backup.sh',
+          'Cambiarle la extensión a .exe',
+          'Cerrar y volver a abrir la terminal',
+        ],
+        correcta: 1,
+        explicacion:
+          'Linux solo ejecuta archivos que tienen la x en sus permisos. Un archivo recién creado nace sin ella; chmod 755 se la da al dueño (y deja al grupo y a los demás leer y ejecutar).',
+      },
+      {
+        enunciado: '¿Cuál de estas líneas guarda correctamente el texto Ana en una variable?',
+        opciones: ['nombre = "Ana"', '$nombre="Ana"', 'nombre="Ana"', 'nombre: "Ana"'],
+        correcta: 2,
+        explicacion:
+          'La asignación va toda junta, sin espacios alrededor del =. Con espacios, bash toma nombre como un comando y falla. El $ se usa para leer la variable, no para crearla.',
+      },
+      {
+        enunciado: "El usuario actual es alumno. ¿Qué muestra echo 'Hola $USER'?",
+        opciones: ['Hola alumno', 'Hola $USER', 'Hola', 'Un error, porque USER no existe'],
+        correcta: 1,
+        explicacion:
+          'Entre comillas simples bash no reemplaza nada: imprime el texto tal cual. Con comillas dobles, "Hola $USER", sí mostraría Hola alumno.',
+      },
+      {
+        enunciado: 'Un script tiene la línea if [$edad -ge 18]; then y al correrlo da error. ¿Por qué?',
+        opciones: [
+          'Porque -ge solo sirve para comparar textos',
+          'Porque los if no pueden usar variables',
+          'Porque falta el else',
+          'Porque faltan los espacios después de [ y antes de ]',
+        ],
+        correcta: 3,
+        explicacion:
+          'El corchete [ es un comando más, y ] es su último argumento: tienen que ir separados por espacios. La forma correcta es if [ "$edad" -ge 18 ]; then.',
+      },
+      {
+        enunciado: 'Tenés una función sumar que hace echo $(( $1 + $2 )). ¿Cómo guardás su resultado en la variable total?',
+        opciones: ['total=sumar 2 3', 'total=$(sumar 2 3)', 'sumar 2 3 > total', 'total=return sumar 2 3'],
+        correcta: 1,
+        explicacion:
+          'En bash una función "devuelve" un dato imprimiéndolo con echo. $( ) captura lo que imprime un comando, así que total=$(sumar 2 3) guarda 5.',
+      },
+      {
+        enunciado: 'Querés que /home/alumno/backup.sh corra de lunes a viernes a las 9:00. ¿Qué línea va en el crontab?',
+        opciones: [
+          '9 0 * * 1-5 /home/alumno/backup.sh',
+          '0 9 1-5 * * /home/alumno/backup.sh',
+          '0 9 * * 1-5 /home/alumno/backup.sh',
+          '* 9 * * 1-5 /home/alumno/backup.sh',
+        ],
+        correcta: 2,
+        explicacion:
+          'El orden es minuto, hora, día del mes, mes y día de la semana. 0 9 es las 9:00 en punto, y 1-5 en el último campo va de lunes a viernes. Con * en el minuto correría 60 veces, una por cada minuto de las 9.',
+      },
+    ],
+  },
 ];
