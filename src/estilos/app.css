@@ -1,6 +1,6 @@
 /* Layout. Todo color sale de tokens.css. */
 
-.app { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+.app { display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); height: 100vh; }
 
 /* ---------- barra superior ---------- */
 .rail {
@@ -21,7 +21,8 @@
   color: var(--texto-tenue); letter-spacing: 0.04em; text-transform: uppercase;
 }
 
-.modulos { display: flex; flex: 1; }
+/* min-width 0: si las pestañas no entran, la tira se desliza en vez de ensanchar la pagina. */
+.modulos { display: flex; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
 
 .tab {
   appearance: none; background: none; border: 0; cursor: pointer;
@@ -193,6 +194,70 @@ details.pista .prosa { margin-top: var(--sp-3); font-size: var(--esc-base); }
 }
 .term__ayuda code { background: none; border: 0; color: var(--term-acento); padding: 0; }
 
+/* ---------- nano ---------- */
+/* Ocupa el lugar del historial dentro de la terminal, como el nano de verdad
+   ocupa la pantalla entera. Barras invertidas arriba y abajo, igual que nano. */
+.nano {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  font-family: var(--tipo-mono); font-size: var(--esc-sm); color: var(--term-texto);
+}
+.nano__titulo {
+  display: flex; justify-content: space-between; gap: var(--sp-3);
+  background: var(--term-texto); color: var(--term-fondo);
+  padding: 2px var(--sp-4); font-size: var(--esc-xs);
+}
+.nano__titulo b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nano__titulo span { min-width: 9ch; }
+.nano__titulo span:last-child { text-align: right; }
+.nano__cuerpo {
+  flex: 1; min-height: 0; overflow: auto;
+  display: grid; grid-template-columns: auto 1fr; align-items: start;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) 0; cursor: text;
+}
+.nano__numeros {
+  display: flex; flex-direction: column; text-align: right;
+  padding: 0 var(--sp-3) 0 var(--sp-4); color: var(--term-tenue);
+  font-variant-numeric: tabular-nums; line-height: 1.55; user-select: none;
+}
+.nano textarea {
+  width: 100%; min-width: 0; resize: none; overflow: hidden;
+  background: none; border: 0; outline: none; padding: 0; margin: 0;
+  font: inherit; line-height: 1.55; color: var(--term-texto);
+  caret-color: var(--term-acento); white-space: pre; tab-size: 2;
+}
+.nano__estado {
+  min-height: 1.55em; margin: 0; padding: 2px var(--sp-4);
+  text-align: center; font-size: var(--esc-xs); color: var(--term-prompt);
+}
+.nano__estado[data-error='si'] { color: var(--term-error); }
+.nano__pregunta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4); background: var(--term-acento); color: var(--term-fondo);
+  font-size: var(--esc-xs); font-weight: 600;
+}
+.nano__pregunta div { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.nano__pregunta button {
+  font: inherit; cursor: pointer; border-radius: var(--radio);
+  border: 1px solid var(--term-fondo); background: transparent; color: var(--term-fondo);
+  padding: 2px var(--sp-2);
+}
+.nano__pregunta button:focus-visible { outline: 2px solid var(--term-fondo); outline-offset: 1px; }
+.nano__atajos {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-4);
+  padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--term-borde); font-size: var(--esc-xs);
+}
+.nano__atajos button {
+  font: inherit; cursor: pointer; background: none; border: 0; padding: 2px 0; color: var(--term-texto);
+}
+.nano__atajos button:hover:not(:disabled) { color: var(--term-acento); }
+.nano__atajos button:disabled { opacity: 0.5; cursor: default; }
+.nano kbd {
+  font: inherit; font-weight: 600; background: var(--term-texto); color: var(--term-fondo);
+  padding: 0 4px; border-radius: 2px; margin-right: 4px;
+}
+.nano__pregunta kbd { background: var(--term-fondo); color: var(--term-acento); }
+.nano__nota { color: var(--term-tenue); margin-left: auto; }
+
 /* ---------- cosmeticos del pase ---------- */
 /* El tema se aplica pisando las variables --term-* en .app desde React.
    Lo de aca abajo es lo que no se puede expresar como variable. */
@@ -349,8 +414,16 @@ details.pista .prosa { margin-top: var(--sp-3); font-size: var(--esc-base); }
 
 @media (max-width: 900px) {
   .app { height: auto; }
-  .cuerpo { grid-template-columns: 1fr; }
+  .cuerpo { grid-template-columns: minmax(0, 1fr); }
   .panel { border-right: 0; border-bottom: 1px solid var(--borde); }
   .term { min-height: 60vh; }
   .rail { flex-wrap: wrap; gap: var(--sp-3); }
+  /* Cinco modulos no entran en un celular: la tira de pestañas se desliza
+     sola, sin empujar la pagina para el costado. */
+  .modulos {
+    flex-basis: 100%; min-width: 0; order: 3;
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin;
+    margin: 0 calc(-1 * var(--sp-5)); padding: 0 var(--sp-5);
+  }
+  .tab { flex: 0 0 auto; max-width: 12rem; }
 }

@@ -3,7 +3,7 @@
 // El XP se DERIVA del progreso, no se guarda aparte. Un contador acumulado se
 // desincroniza en cuanto algo falla a mitad de camino; recalcularlo siempre
 // desde la misma fuente de verdad no puede quedar torcido.
-import { LECCIONES, QUIZZES } from './index';
+import { LECCIONES, MODULOS, QUIZZES } from './index';
 import { PUNTOS, RANGOS } from './pase';
 import type { Rango } from './pase';
 import { HUEVOS } from './huevos';
@@ -36,7 +36,7 @@ export function calcularXp(p: Progreso): number {
 
   for (const q of QUIZZES) xp += (p.quizzes[q.modulo] ?? 0) * PUNTOS.quizAcierto;
 
-  for (const m of [1, 2, 3, 4]) {
+  for (const { numero: m } of MODULOS) {
     const suyas = LECCIONES.filter((l) => l.modulo === m);
     const todas = suyas.length > 0 && suyas.every((l) => p.completadas.has(l.id));
     if (todas && aprobo(m, p.quizzes)) xp += PUNTOS.moduloCompleto;

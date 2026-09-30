@@ -36,17 +36,24 @@ terminar armándose esa mesa.
 
 | | |
 |---|---|
-| Módulos | 4 |
-| Lecciones | 31 |
-| Preguntas de cuestionario | 24 |
-| Comandos implementados | 37 |
-| Páginas de manual en español | 30 |
-| Pruebas automatizadas | 136 |
+| Módulos | 5 |
+| Lecciones | 40 |
+| Preguntas de cuestionario | 30 |
+| Comandos implementados | 43 |
+| Páginas de manual en español | 37 |
+| Pruebas automatizadas | 265 |
 
 Un intérprete de comandos propio: resolución de rutas, comodines, tuberías,
 redirección, permisos octales, tabla de procesos y cola de impresión. El
 autocompletado con Tab funciona como en bash, incluido el listado de candidatos
 cuando hay ambigüedad.
+
+Desde el módulo 5 también ejecuta **scripts**: variables, `$1` y `$#`,
+`$(comando)`, `$((cuenta))`, `if`, `for`, `while`, funciones, `read` por
+tubería y `crontab`. Los scripts se escriben en un `nano` simulado (Ctrl+O
+guarda, Ctrl+X sale) y se ejecutan con `./script.sh` respetando el permiso de
+ejecución. Un bucle infinito se corta solo en vez de colgar la página. La
+suite compara decenas de fragmentos contra la salida de bash real.
 
 ## Cómo se usa
 
@@ -88,8 +95,9 @@ todo cosmético sea alcanzable— y para la alineación del arte ASCII del pase.
 
 ```
 src/
-  motor/          intérprete: filesystem virtual, parser, comandos
-    comandos/     los 37 comandos, agrupados por tema
+  motor/          intérprete: filesystem virtual, comandos
+    shell.ts      el bash del simulador: parser, variables, if/for, scripts
+    comandos/     los comandos, agrupados por tema
   contenido/      lecciones, cuestionarios, definiciones del pase
   ui/             componentes React y store
   estilos/        sistema de diseño en variables CSS

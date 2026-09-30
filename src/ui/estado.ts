@@ -1,7 +1,10 @@
 // Store de la app. Lo escribe el orquestador: el agente de UI solo consume este hook.
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import type { Estado } from '../motor/tipos';
+import type { EditorPedido, Estado } from '../motor/tipos';
 import { ejecutar, nuevoEstado } from '../motor/motor';
+import { guardarEditor } from '../motor/editor';
+import type { Guardado as GuardadoEditor } from '../motor/editor';
+import { NOMBRES_BUILTINS } from '../motor/shell';
 import { completar } from '../motor/completar';
 import { REGISTRO } from '../motor/comandos';
 import { LECCIONES, MODULOS, QUIZ_POR_MODULO } from '../contenido';
@@ -14,7 +17,7 @@ import { BANNER, bannerRango } from '../motor/comandos/pase';
 import { sonarMision, sonarRango } from './sonido';
 
 const FF = String.fromCharCode(12); // el 'clear' del simulador
-const COMANDOS = Object.keys(REGISTRO).sort();
+const COMANDOS = [...new Set([...Object.keys(REGISTRO), ...NOMBRES_BUILTINS])].sort();
 const CLAVE = 'linux-survival-es:v1';
 
 export interface Linea {
@@ -69,6 +72,9 @@ export function useCurso() {
   const [pistas, setPistas] = useState<Set<string>>(new Set(inicial.pistas));
   const [hallazgos, setHallazgos] = useState<Set<string>>(new Set(inicial.hallazgos));
   const [logro, setLogro] = useState<Logro | null>(null);
+  /** nano o crontab -e abiertos: la terminal muestra el editor en lugar del historial. */
+  const [editor, setEditor] = useState<EditorPedido | null>(null);
+  const guardoEnEditor = useRef(false);
 
   const leccion: Leccion = LECCIONES[indice];
   const cumplida = completadas.has(leccion.id);
@@ -110,6 +116,7 @@ export function useCurso() {
     motor.current = nuevoEstado();
     setLineas(efecto === 'efecto-banner' ? [{ tipo: 'salida', texto: BANNER }] : []);
     setLogro(null);
+    setEditor(null);
   }, [efecto]);
 
   useEffect(reiniciar, [indice, reiniciar]);
@@ -136,27 +143,15 @@ export function useCurso() {
     [idPrompt, xp]
   );
 
-  const correr = useCallback(
-    (linea: string) => {
-      const texto = linea.trim();
-      const prompt = armarPrompt(motor.current.cwd);
-      setLineas((prev) => [...prev, { tipo: 'entrada', texto: prompt + ' ' + linea }]);
-      if (!texto) return;
-
-      const r = ejecutar(texto, motor.current);
-
-      if (r.salida.includes(FF)) {
-        setLineas([]);
-      } else {
-        const nuevas: Linea[] = [];
-        if (r.salida) nuevas.push({ tipo: 'salida', texto: r.salida.replace(/\n$/, '') });
-        if (r.error) nuevas.push({ tipo: 'error', texto: r.error });
-        if (nuevas.length) setLineas((prev) => [...prev, ...nuevas]);
-      }
-
+  /**
+   * Despues de cada cambio al mundo (un comando o un guardado en nano):
+   * busca huevos de pascua en la salida y revisa si la leccion quedo cumplida.
+   */
+  const evaluar = useCallback(
+    (salida: string) => {
       // Huevos de pascua: alcanza con que el token aparezca en la salida, asi
       // que funciona con cat, more, head, grep y tuberias por igual.
-      const nuevos = HUEVOS.filter((h) => !hallazgos.has(h.id) && r.salida.includes(token(h.id)));
+      const nuevos = HUEVOS.filter((h) => !hallazgos.has(h.id) && salida.includes(token(h.id)));
       let ganaHuevos = 0;
 
       if (nuevos.length) {
@@ -230,7 +225,34 @@ export function useCurso() {
         else sonarMision();
       }
     },
-    [completadas, leccion, pistas, xp, hallazgos, armarPrompt]
+    [completadas, leccion, pistas, xp, hallazgos]
+  );
+
+  const correr = useCallback(
+    (linea: string) => {
+      const texto = linea.trim();
+      const prompt = armarPrompt(motor.current.cwd);
+      setLineas((prev) => [...prev, { tipo: 'entrada', texto: prompt + ' ' + linea }]);
+      if (!texto) return;
+
+      const r = ejecutar(texto, motor.current);
+      if (r.editor) {
+        guardoEnEditor.current = false;
+        setEditor(r.editor);
+      }
+
+      if (r.salida.includes(FF)) {
+        setLineas([]);
+      } else {
+        const nuevas: Linea[] = [];
+        if (r.salida) nuevas.push({ tipo: 'salida', texto: r.salida.replace(/\n$/, '') });
+        if (r.error) nuevas.push({ tipo: 'error', texto: r.error });
+        if (nuevas.length) setLineas((prev) => [...prev, ...nuevas]);
+      }
+
+      evaluar(r.salida);
+    },
+    [armarPrompt, evaluar]
   );
   /**
    * Completado con Tab. Devuelve la linea ya completada. Si hay ambiguedad,
@@ -247,6 +269,33 @@ export function useCurso() {
     }
     return s.linea;
   }, [armarPrompt]);
+
+  /** ^O en el editor. Si el archivo quedo bien, puede cumplir la leccion. */
+  const guardarDesdeEditor = useCallback(
+    (texto: string): GuardadoEditor => {
+      if (!editor) return { ok: false, mensaje: 'No hay nada abierto' };
+      const g = guardarEditor(editor, texto, motor.current);
+      if (g.ok) {
+        guardoEnEditor.current = true;
+        evaluar('');
+      }
+      return g;
+    },
+    [editor, evaluar]
+  );
+
+  /** ^X en el editor: vuelve a la terminal. crontab -e avisa si instalo algo, como el de verdad. */
+  const cerrarEditor = useCallback(() => {
+    if (editor?.destino === 'crontab') {
+      setLineas((prev) => [
+        ...prev,
+        guardoEnEditor.current
+          ? { tipo: 'salida', texto: 'crontab: instalando el nuevo crontab' }
+          : { tipo: 'salida', texto: 'crontab: no hubo cambios, no se instaló nada' },
+      ]);
+    }
+    setEditor(null);
+  }, [editor]);
 
   // Estable a proposito: el aviso la usa como dependencia de su temporizador.
   // Si cambiara de identidad en cada render, cada tecla tipeada reiniciaria la
@@ -286,6 +335,9 @@ export function useCurso() {
     prompt: armarPrompt(motor.current.cwd),
     correr,
     sugerir,
+    editor,
+    guardarDesdeEditor,
+    cerrarEditor,
     reiniciar,
     registrarQuiz,
     progresoModulo,

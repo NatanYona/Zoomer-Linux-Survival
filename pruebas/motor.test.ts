@@ -11,34 +11,32 @@ vi.mock('../src/motor/comandos', () => {
   return { REGISTRO: { echo, mayus } };
 });
 
-import { parsear } from '../src/motor/parser';
+import { tokenizar } from '../src/motor/shell';
 import { ejecutar, nuevoEstado } from '../src/motor/motor';
 import { buscarRuta } from '../src/motor/vfs';
 
-describe('parsear', () => {
-  it('respeta comillas simples y dobles', () => {
-    const etapas = parsear(`echo "hola mundo" 'foo bar' baz`);
-    expect(etapas).toHaveLength(1);
-    expect(etapas[0]).toEqual({ cmd: 'echo', args: ['hola mundo', 'foo bar', 'baz'] });
+describe('tokenizar', () => {
+  const palabras = (linea: string) => tokenizar(linea).map((t) => t.valor);
+
+  it('las comillas agrupan una palabra (y quedan para la expansion)', () => {
+    expect(palabras(`echo "hola mundo" 'foo bar' baz`)).toEqual(['echo', '"hola mundo"', "'foo bar'", 'baz']);
   });
 
-  it('separa en etapas por pipe', () => {
-    const etapas = parsear('echo hola | mayus');
-    expect(etapas.map((e) => e.cmd)).toEqual(['echo', 'mayus']);
-    expect(etapas[0].args).toEqual(['hola']);
+  it('aisla el pipe y las redirecciones', () => {
+    expect(palabras('echo hola | mayus')).toEqual(['echo', 'hola', '|', 'mayus']);
+    expect(palabras('echo hola > salida.txt')).toEqual(['echo', 'hola', '>', 'salida.txt']);
+    expect(palabras('echo hola >> salida.txt')).toEqual(['echo', 'hola', '>>', 'salida.txt']);
+    expect(palabras('ls nada 2>&1')).toEqual(['ls', 'nada', '2>&1']);
   });
 
-  it('detecta redireccion > y >>', () => {
-    const [a] = parsear('echo hola > salida.txt');
-    expect(a.redir).toEqual({ archivo: 'salida.txt', anexar: false });
-
-    const [b] = parsear('echo hola >> salida.txt');
-    expect(b.redir).toEqual({ archivo: 'salida.txt', anexar: true });
+  it('linea vacia o solo espacios no da tokens', () => {
+    expect(tokenizar('')).toEqual([]);
+    expect(tokenizar('    ')).toEqual([]);
   });
 
-  it('linea vacia o solo espacios da array vacio', () => {
-    expect(parsear('')).toEqual([]);
-    expect(parsear('    ')).toEqual([]);
+  it('las comillas se sacan al ejecutar', () => {
+    const r = ejecutar(`echo "hola mundo" 'foo bar' baz`, nuevoEstado());
+    expect(r.salida).toBe('hola mundo foo bar baz\n');
   });
 });
 

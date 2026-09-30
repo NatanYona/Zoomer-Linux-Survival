@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import type { Linea } from './estado';
+import type { EditorPedido } from '../motor/tipos';
+import type { Guardado } from '../motor/editor';
+import { Editor } from './Editor';
 
 interface Props {
   lineas: Linea[];
@@ -11,6 +14,10 @@ interface Props {
   onCompletar: (linea: string) => string;
   /** Cosmetico `efecto-typewriter` equipado. */
   typewriter: boolean;
+  /** nano abierto: tapa el historial hasta que el alumno sale con ^X. */
+  editor: EditorPedido | null;
+  onGuardar: (texto: string) => Guardado;
+  onSalirEditor: () => void;
 }
 
 /**
@@ -46,7 +53,7 @@ const CLASE: Record<Linea['tipo'], string> = {
   logro: 'l-logro',
 };
 
-export function Terminal({ lineas, prompt, onCorrer, onCompletar, typewriter }: Props) {
+export function Terminal({ lineas, prompt, onCorrer, onCompletar, typewriter, editor, onGuardar, onSalirEditor }: Props) {
   const [valor, setValor] = useState('');
   const [hist, setHist] = useState<string[]>([]);
   const [pos, setPos] = useState(-1);
@@ -56,7 +63,14 @@ export function Terminal({ lineas, prompt, onCorrer, onCompletar, typewriter }: 
   useEffect(() => {
     const el = scroll.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [lineas]);
+  }, [lineas, editor]);
+
+  // Al salir de nano el foco vuelve al prompt, como en la terminal de verdad.
+  const habiaEditor = useRef(false);
+  useEffect(() => {
+    if (habiaEditor.current && !editor) campo.current?.focus();
+    habiaEditor.current = !!editor;
+  }, [editor]);
 
 
   function enviar() {
@@ -113,7 +127,12 @@ export function Terminal({ lineas, prompt, onCorrer, onCompletar, typewriter }: 
 
       {/* El prompt va DENTRO del historial, como ultima linea: en una terminal
           real el cursor baja con cada comando en vez de quedarse fijo abajo. */}
-      <div className="term__scroll" ref={scroll} onClick={() => campo.current?.focus()}>
+      {editor && (
+        // key: cada nano nuevo arranca con su propio contenido y estado
+        <Editor key={editor.ruta + editor.contenido} pedido={editor} onGuardar={onGuardar} onSalir={onSalirEditor} />
+      )}
+
+      <div className="term__scroll" ref={scroll} onClick={() => campo.current?.focus()} hidden={!!editor}>
         {lineas.map((l, i) => (
           <pre key={i} className={CLASE[l.tipo]}>
             {/* Solo la ultima linea se anima: reanimar el historial entero en
@@ -143,14 +162,17 @@ export function Terminal({ lineas, prompt, onCorrer, onCompletar, typewriter }: 
             autoCapitalize="off"
             autoCorrect="off"
             autoFocus
+            disabled={!!editor}
             aria-label="Escribí un comando"
           />
         </form>
       </div>
 
-      <p className="term__ayuda">
-        <code>help</code> comandos · <code>man &lt;cmd&gt;</code> manual · <code>pase</code> tu progreso
-      </p>
+      {!editor && (
+        <p className="term__ayuda">
+          <code>help</code> comandos · <code>man &lt;cmd&gt;</code> manual · <code>pase</code> tu progreso
+        </p>
+      )}
     </section>
   );
 }

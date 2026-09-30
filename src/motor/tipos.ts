@@ -34,6 +34,32 @@ export interface Trabajo {
   bytes: number;
 }
 
+/** Una ejecucion de un script. Los validadores del modulo 5 miran esto. */
+export interface Corrida {
+  ruta: string;              // absoluta: '/home/alumno/hola.sh'
+  modo: 'directo' | 'bash';  // ./hola.sh o bash hola.sh
+  args: string[];
+  entrada: string;           // lo que le llego por tuberia
+  salida: string;
+  error: string;
+  codigo: number;
+}
+
+/** Variables y funciones de la terminal: sobreviven de una linea a la otra. */
+export interface Entorno {
+  vars: Record<string, string>;
+  funciones: Record<string, unknown>;
+  ultimo?: number;           // $?
+}
+
+/** Lo que devuelve `nano` o `crontab -e`: la UI abre el editor con esto. */
+export interface EditorPedido {
+  destino: 'archivo' | 'crontab';
+  ruta: string;              // absoluta; para crontab, un nombre de fantasia
+  contenido: string;
+  nuevo: boolean;
+}
+
 export interface Estado {
   fs: NodoDir;
   cwd: string[];             // segmentos desde la raiz; [] === '/'
@@ -42,6 +68,10 @@ export interface Estado {
   procesos: Proceso[];
   colaImpresion: Trabajo[];
   historial: string[];       // lineas completas tal como las tipeo el alumno
+  entorno?: Entorno;
+  corridas?: Corrida[];
+  /** crontab instalado del alumno; undefined = no tiene */
+  crontab?: string;
 }
 
 export interface Ctx {
@@ -54,6 +84,8 @@ export interface Resultado {
   salida: string;            // stdout
   error?: string;            // stderr
   codigo: number;            // 0 = ok
+  /** Solo nano y crontab -e: pide abrir el editor. */
+  editor?: EditorPedido;
 }
 
 export type Comando = (ctx: Ctx) => Resultado;

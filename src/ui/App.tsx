@@ -180,7 +180,7 @@ export function App() {
               onTerminar={(a) => c.registrarQuiz(moduloActivo, a)}
               onSalir={() => {
                 setEnQuiz(null);
-                if (moduloActivo < 4) irAModulo(moduloActivo + 1);
+                if (moduloActivo < c.modulos.length) irAModulo(moduloActivo + 1);
               }}
             />
           ) : (
@@ -234,6 +234,9 @@ export function App() {
           onCorrer={c.correr}
           onCompletar={c.sugerir}
           typewriter={c.perfil.equipado.efecto === 'efecto-typewriter'}
+          editor={c.editor}
+          onGuardar={c.guardarDesdeEditor}
+          onSalirEditor={c.cerrarEditor}
         />
       </div>
 

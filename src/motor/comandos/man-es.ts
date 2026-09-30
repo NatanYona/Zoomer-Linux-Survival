@@ -402,18 +402,21 @@ EJEMPLOS
     echo - mostrar un texto
 
 SINOPSIS
-    echo [-n] [texto...]
+    echo [-n] [-e] [texto...]
 
 DESCRIPCIÓN
     Imprime los argumentos separados por un espacio, seguido de un
-    salto de línea.
+    salto de línea. Entre comillas dobles reemplaza las variables por
+    su valor; entre comillas simples imprime todo tal cual.
 
 OPCIONES
     -n    no agrega el salto de línea final.
+    -e    interpreta \\n (salto de línea) y \\t (tabulación).
 
 EJEMPLOS
     echo hola mundo
-    echo -n "sin salto"`,
+    echo "Hola $USER"
+    echo -e "línea 1\\nlínea 2"`,
 
   whoami: `NOMBRE
     whoami - mostrar el usuario actual
@@ -480,4 +483,124 @@ DESCRIPCIÓN
 EJEMPLOS
     file diagrama.png
     file practica/saludo.sh`,
+
+  nano: `NOMBRE
+    nano - editor de texto de la terminal
+
+SINOPSIS
+    nano archivo
+
+DESCRIPCIÓN
+    Abre el archivo para editarlo. Si no existe, lo crea al guardar.
+    Los atajos se muestran abajo; ^ significa la tecla Ctrl.
+
+ATAJOS
+    Ctrl+O    guarda el archivo.
+    Ctrl+X    sale. Si hay cambios sin guardar, pregunta antes.
+    Tab       inserta dos espacios de sangría.
+
+EJEMPLOS
+    nano hola.sh
+    nano ~/practica/saludo.sh`,
+
+  bash: `NOMBRE
+    bash - el intérprete de comandos
+
+SINOPSIS
+    bash script.sh [argumentos...]
+    ./script.sh [argumentos...]
+
+DESCRIPCIÓN
+    Ejecuta los comandos de un script, uno por línea. Con bash script.sh
+    alcanza con poder leer el archivo; con ./script.sh además hace falta
+    el permiso de ejecución (chmod 755 script.sh).
+
+    Dentro de un script: variables (x=1, $x), argumentos ($1, $#, $0),
+    $(comando), $((cuenta)), if, for, while y funciones.
+
+EJEMPLOS
+    bash hola.sh
+    ./saludar.sh Ana
+    for i in 1 2 3; do echo $i; done`,
+
+  read: `NOMBRE
+    read - leer una línea de la entrada
+
+SINOPSIS
+    read [-p mensaje] variable...
+
+DESCRIPCIÓN
+    Lee una línea de la entrada estándar y la guarda en las variables
+    indicadas: la primera palabra en la primera variable y el resto en
+    la última. En este simulador la entrada llega por tubería.
+
+OPCIONES
+    -p mensaje    muestra un mensaje antes de leer (solo cuando la
+                  entrada viene del teclado).
+
+EJEMPLOS
+    echo Ana | ./recibir.sh
+    echo "Ana López" | { read nombre apellido; echo $apellido; }`,
+
+  test: `NOMBRE
+    test, [ ] - evaluar una condición
+
+SINOPSIS
+    test expresión
+    [ expresión ]
+
+DESCRIPCIÓN
+    Devuelve 0 (verdadero) o 1 (falso). Se usa sobre todo con if y
+    while. Los espacios después de [ y antes de ] son obligatorios.
+
+EXPRESIONES
+    -f archivo    el archivo existe
+    -d carpeta    la carpeta existe
+    -z texto      el texto está vacío
+    a = b         los textos son iguales (a != b, distintos)
+    n -eq m       números iguales; también -ne -lt -le -gt -ge
+    ! expresión   niega la condición
+
+EJEMPLOS
+    [ -f bienvenida.txt ] && echo existe
+    if [ "$edad" -ge 18 ]; then echo mayor; fi`,
+
+  crontab: `NOMBRE
+    crontab - programar tareas
+
+SINOPSIS
+    crontab -l | -e | -r
+    crontab archivo
+
+DESCRIPCIÓN
+    Maneja la lista de tareas que cron ejecuta solo. Cada línea tiene
+    cinco campos de tiempo y el comando:
+
+        minuto hora día-del-mes mes día-de-semana comando
+
+    Un * significa "cualquiera"; */15 es "cada 15"; 1-5 es un rango y
+    1,3,5 una lista. Día de semana: 0 y 7 son domingo.
+
+OPCIONES
+    -l    muestra las tareas instaladas.
+    -e    las edita con nano.
+    -r    borra TODAS las tareas, sin preguntar.
+
+EJEMPLOS
+    0 22 * * * /home/alumno/backup.sh       todos los días a las 22:00
+    */15 * * * * /home/alumno/chequeo.sh    cada 15 minutos
+    30 3 * * 0 /home/alumno/limpiar.sh      domingos a las 3:30`,
+
+  sleep: `NOMBRE
+    sleep - esperar unos segundos
+
+SINOPSIS
+    sleep segundos
+
+DESCRIPCIÓN
+    Pausa la ejecución. En este simulador no espera de verdad, para no
+    dejar la terminal colgada.
+
+EJEMPLOS
+    sleep 1`,
 };
