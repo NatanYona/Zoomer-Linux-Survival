@@ -1455,6 +1455,8 @@ function correrSimple(n: Nodo & { k: 'simple' }, s: Sesion, sum: Sumidero, ent: 
       let msg = `${donde}: ${cmd}: orden no encontrada`;
       if (args[0] === '=' || args[0]?.startsWith('=')) {
         msg += `\n(¿querías guardar una variable? Va todo junto, sin espacios: ${cmd}=valor)`;
+      } else if (cmd.startsWith('[') && cmd !== '[') {
+        msg += '\n(después de [ va un espacio, y antes de ] también. Por ejemplo: [ $x -eq 1 ])';
       } else if (/\.sh$/.test(cmd)) {
         const existe = buscarRuta(cmd, s.e);
         if (existe) msg += `\n(para ejecutar un archivo de la carpeta actual escribí ./${cmd})`;
