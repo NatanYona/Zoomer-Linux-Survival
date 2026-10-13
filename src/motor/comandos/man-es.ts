@@ -210,13 +210,66 @@ SINOPSIS
     chmod modo archivo...
 
 DESCRIPCIÓN
-    Cambia el modo de cada archivo. El modo se escribe en notación
-    octal de tres dígitos (dueño, grupo, otros); no se admite la
-    notación simbólica (u+x, g-w, etc).
+    Cambia el modo de cada archivo. El modo se escribe en octal, tres
+    dígitos (dueño, grupo, otros), o en notación simbólica: quién
+    (u dueño, g grupo, o otros, a todos), + suma, - quita, = fija,
+    y los permisos (r, w, x). Sin "quién" se aplica a todos.
 
 EJEMPLOS
     chmod 754 saludo.sh
-    chmod 600 diario.txt`,
+    chmod 600 diario.txt
+    chmod +x respaldar
+    chmod go-w notas.txt`,
+
+  alias: `NOMBRE
+    alias - crear atajos para comandos
+
+SINOPSIS
+    alias [nombre='comando ...']
+
+DESCRIPCIÓN
+    Sin argumentos lista los alias definidos. Con nombre='texto', cada
+    vez que la línea empiece con nombre, bash lo reemplaza por el texto.
+    Lo que escribas después se agrega al final. Los alias duran lo que
+    dura la terminal: para que sobrevivan, se guardan en ~/.bash_aliases
+    y se cargan con source. Dentro de un script no se expanden.
+    unalias nombre borra uno.
+
+EJEMPLOS
+    alias ll='ls -la'
+    alias
+    unalias ll`,
+
+  type: `NOMBRE
+    type - qué es exactamente un comando
+
+SINOPSIS
+    type nombre...
+
+DESCRIPCIÓN
+    Dice cómo interpretaría bash cada nombre: un alias, una función,
+    una orden interna del shell o un programa en alguna carpeta del
+    PATH (y cuál).
+
+EJEMPLOS
+    type ll
+    type cd
+    type respaldar`,
+
+  which: `NOMBRE
+    which - dónde está el programa de un comando
+
+SINOPSIS
+    which nombre...
+
+DESCRIPCIÓN
+    Busca cada nombre en las carpetas de la variable PATH, en orden, y
+    muestra la ruta del primer ejecutable que encuentra. No conoce los
+    alias ni las funciones: para eso está type.
+
+EJEMPLOS
+    which ls
+    which respaldar`,
 
   grep: `NOMBRE
     grep - buscar líneas que coincidan con un patrón

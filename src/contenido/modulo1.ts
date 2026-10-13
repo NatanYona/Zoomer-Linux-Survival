@@ -6,6 +6,7 @@ import { buscar } from '../motor/vfs';
 export const MODULO1: Modulo = {
   numero: 1,
   titulo: 'El sistema de archivos',
+  corto: 'Archivos',
   introduccion:
     'En este modulo vas a aprender a moverte por el sistema de archivos de Linux: como esta organizado, como mirar que hay en cada lugar, y como crear, mover y renombrar directorios y archivos. Al terminar vas a poder orientarte en cualquier terminal sin perderte.',
   cierre:

@@ -36,12 +36,12 @@ terminar armándose esa mesa.
 
 | | |
 |---|---|
-| Módulos | 5 |
-| Lecciones | 40 |
-| Preguntas de cuestionario | 30 |
-| Comandos implementados | 43 |
-| Páginas de manual en español | 37 |
-| Pruebas automatizadas | 266 |
+| Módulos | 5, más eventos temporales |
+| Lecciones | 40, más 11 misiones del evento actual |
+| Preguntas de cuestionario | 36 |
+| Comandos implementados | 58, contando las órdenes internas del shell |
+| Páginas de manual en español | 40 |
+| Pruebas automatizadas | 316 |
 
 Un intérprete de comandos propio: resolución de rutas, comodines, tuberías,
 redirección, permisos octales, tabla de procesos y cola de impresión. El
@@ -55,8 +55,47 @@ guarda, Ctrl+X sale) y se ejecutan con `./script.sh` respetando el permiso de
 ejecución. Un bucle infinito se corta solo en vez de colgar la página. La
 suite compara decenas de fragmentos contra la salida de bash real.
 
-Para quien da la clase: [guía del módulo 5](docs/guia-modulo-5.md), con la
-resolución paso a paso de cada lección y los errores más comunes.
+También entiende `alias` y `unalias`, busca los comandos en las carpetas del
+`PATH` (así un script en `~/bin` se vuelve un comando más), y tiene `type`,
+`which` y `chmod` en notación simbólica (`chmod +x`).
+
+## Eventos
+
+Además de los cinco módulos, el curso puede tener **eventos**: talleres de una
+semana. Mientras dura uno, al entrar aparece un pop-up de noticias que lo
+anuncia y en la barra se suma la pestaña **Evento del día**, con sus misiones y
+su cuestionario. Al terminar la semana, el pop-up y la pestaña desaparecen,
+pero el XP que cada alumno ganó se mantiene.
+
+Para el pase, el XP de un evento es un bonus, como los huevos de pascua: quien
+estuvo esa semana puede llegar a root por ese camino, y quien no, sigue
+pudiendo llegar explorando. El rango más alto no depende de haber estado.
+
+**Operación Atajo** (12 al 18 de octubre de 2026), 11 misiones:
+
+- **1 a 6, herramientas:** alias, `~/.bash_aliases` y `source`, el `PATH`,
+  `which` y `type`, comandos propios en `~/bin`, un script de respaldo y su
+  tarea en cron.
+- **7 a 11, scripts que deciden:** `if` con `-d`, `$#` y `exit 1`,
+  `if / elif / else` con números, `&&`, `||` y `2>>`, y `while read`
+  recorriendo un archivo.
+
+Desde la misión 7, cada una arranca con lo que se armó en la anterior. Las que
+piden un script lo prueban también con otros datos (un log con otra cantidad
+de errores, otra lista de notas), así que no se pueden aprobar imprimiendo el
+resultado a mano.
+
+Un evento es un módulo más, marcado con `evento` y sus fechas
+([`src/contenido/evento.ts`](src/contenido/evento.ts)). Para reabrirlo otra
+semana alcanza con mover `desde` y `hasta`.
+
+## Guías para docentes
+
+- [Módulo 5: scripts y automatización](docs/guia-modulo-5.md)
+- [Evento Operación Atajo](docs/guia-evento-atajo.md)
+
+Cada guía tiene la resolución paso a paso, las salidas reales del simulador,
+los errores más comunes y en qué se diferencia de una terminal de verdad.
 
 ## Cómo se usa
 
@@ -89,6 +128,10 @@ La suite es la parte que sostiene el proyecto. Por cada lección corre su
 3. Que el validador **no** dé verdadero en el estado inicial, o sea que la
    lección no nazca ya cumplida.
 
+Para las misiones que piden un script, además hay pruebas con soluciones
+truchas (un semáforo que siempre dice lo mismo, un reporte que no lee el
+archivo, un `> 7` donde iba `-ge 7`) que el validador tiene que rechazar.
+
 Si editás una consigna y la rompés, `npm test` te lo dice antes que un alumno.
 
 Hay pruebas equivalentes para el cálculo de XP —incluida una que verifica que
@@ -102,6 +145,7 @@ src/
     shell.ts      el bash del simulador: parser, variables, if/for, scripts
     comandos/     los comandos, agrupados por tema
   contenido/      lecciones, cuestionarios, definiciones del pase
+    evento.ts     el evento del día: misiones, fechas y texto del pop-up
   ui/             componentes React y store
   estilos/        sistema de diseño en variables CSS
 pruebas/          la suite

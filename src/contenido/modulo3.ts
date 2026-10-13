@@ -6,6 +6,7 @@ import { buscarRuta } from '../motor/vfs';
 export const MODULO3: Modulo = {
   numero: 3,
   titulo: 'Diagnostico, busqueda e impresion',
+  corto: 'Diagnóstico',
   introduccion:
     'En este modulo dejas de limitarte a los comandos basicos y sumas herramientas para orientarte solo: leer el manual de cualquier comando, saber quien sos y quien mas esta en el sistema, y encontrar un archivo perdido sin recorrer carpeta por carpeta. Tambien aprendes a guardar la salida de un comando en un archivo en vez de solo mirarla en pantalla, y a manejar una cola de trabajos real con la impresora del laboratorio.',
   cierre:

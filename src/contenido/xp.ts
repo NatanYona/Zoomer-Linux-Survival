@@ -96,13 +96,18 @@ export function xpMaximo(): number {
 }
 
 /**
- * XP maximo SIN explorar: solo cumpliendo consignas y cuestionarios.
- * El rango mas alto tiene que quedar por encima de este numero, si no explorar
- * es decorativo.
+ * XP maximo SIN explorar: solo cumpliendo las consignas y cuestionarios de la
+ * cursada. El rango mas alto tiene que quedar por encima de este numero, si no
+ * explorar es decorativo.
+ *
+ * Los eventos no cuentan: son temporales, como un bonus. Quien estuvo esa
+ * semana se lleva el XP y puede llegar a root por ese camino; quien no, sigue
+ * pudiendo llegar con los huevos. Asi el rango no depende de haber estado.
  */
 export function xpSinExplorar(): number {
-  const todas = new Set(LECCIONES.map((l) => l.id));
+  const cursada = new Set(MODULOS.filter((m) => !m.evento).map((m) => m.numero));
+  const todas = new Set(LECCIONES.filter((l) => cursada.has(l.modulo)).map((l) => l.id));
   const quizzes: Record<string, number> = {};
-  for (const q of QUIZZES) quizzes[q.modulo] = q.preguntas.length;
+  for (const q of QUIZZES) if (cursada.has(q.modulo)) quizzes[q.modulo] = q.preguntas.length;
   return calcularXp({ completadas: todas, pistas: new Set(), quizzes, hallazgos: new Set() });
 }

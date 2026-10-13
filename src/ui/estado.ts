@@ -1,13 +1,13 @@
 // Store de la app. Lo escribe el orquestador: el agente de UI solo consume este hook.
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { EditorPedido, Estado } from '../motor/tipos';
-import { ejecutar, nuevoEstado } from '../motor/motor';
+import { ejecutar, mundoPara } from '../motor/motor';
 import { guardarEditor } from '../motor/editor';
 import type { Guardado as GuardadoEditor } from '../motor/editor';
 import { NOMBRES_BUILTINS } from '../motor/shell';
 import { completar } from '../motor/completar';
 import { REGISTRO } from '../motor/comandos';
-import { LECCIONES, MODULOS, QUIZ_POR_MODULO } from '../contenido';
+import { LECCIONES_VISIBLES as LECCIONES, MODULOS_VISIBLES as MODULOS, QUIZ_POR_MODULO } from '../contenido';
 import type { Leccion } from '../contenido/esquema';
 import { calcularXp, desbloqueadosPor, progresoRango, rangoDe, xpDeLeccion } from '../contenido/xp';
 import { escribirPerfil, leerPerfil, suscribirPerfil } from '../motor/perfil';
@@ -64,7 +64,7 @@ export interface Logro {
 
 export function useCurso() {
   const inicial = useMemo(cargar, []);
-  const motor = useRef<Estado>(nuevoEstado());
+  const motor = useRef<Estado>(mundoPara(LECCIONES[Math.min(inicial.ultima, LECCIONES.length - 1)].preparacion));
   const [lineas, setLineas] = useState<Linea[]>([]);
   const [indice, setIndice] = useState(Math.min(inicial.ultima, LECCIONES.length - 1));
   const [completadas, setCompletadas] = useState<Set<string>>(new Set(inicial.completadas));
@@ -113,11 +113,11 @@ export function useCurso() {
 
   /** Cada leccion arranca de un mundo limpio: es lo que asume la suite de pruebas. */
   const reiniciar = useCallback(() => {
-    motor.current = nuevoEstado();
+    motor.current = mundoPara(leccion.preparacion);
     setLineas(efecto === 'efecto-banner' ? [{ tipo: 'salida', texto: BANNER }] : []);
     setLogro(null);
     setEditor(null);
-  }, [efecto]);
+  }, [efecto, leccion]);
 
   useEffect(reiniciar, [indice, reiniciar]);
 

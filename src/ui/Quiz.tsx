@@ -19,6 +19,7 @@ export function Quiz({ quiz, modulo, mejor, onTerminar, onSalir }: Props) {
   const [listo, setListo] = useState(false);
 
   const total = quiz.preguntas.length;
+  const nombre = modulo.evento ? modulo.titulo : `Módulo ${modulo.numero}`;
   const p = quiz.preguntas[idx];
 
   function elegir(i: number) {
@@ -48,7 +49,7 @@ export function Quiz({ quiz, modulo, mejor, onTerminar, onSalir }: Props) {
     const bien = aciertos >= Math.ceil(total * 0.7);
     return (
       <div className="quiz">
-        <p className="eyebrow">Módulo {modulo.numero} · Resultado</p>
+        <p className="eyebrow">{nombre} · Resultado</p>
         <p className="puntaje" style={{ color: bien ? 'var(--exito)' : 'var(--acento)' }}>
           {aciertos}/{total}
         </p>
@@ -74,7 +75,7 @@ export function Quiz({ quiz, modulo, mejor, onTerminar, onSalir }: Props) {
   return (
     <div className="quiz">
       <p className="eyebrow">
-        Módulo {modulo.numero} · Cuestionario · {idx + 1} de {total}
+        {nombre} · Cuestionario · {idx + 1} de {total}
         {mejor !== undefined ? ' · mejor: ' + mejor + '/' + total : ''}
       </p>
       <h2 className="titulo">

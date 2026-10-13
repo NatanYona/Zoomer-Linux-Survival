@@ -13,6 +13,7 @@ import { Quiz } from './Quiz';
 import type { CSSProperties } from 'react';
 import { Prosa, BloqueCmd } from './Prosa';
 import { Aviso } from './Aviso';
+import { Noticia } from './Noticia';
 import { COSMETICOS } from '../contenido/pase';
 import type { TipoCosmetico } from '../contenido/pase';
 
@@ -56,6 +57,8 @@ export function App() {
   const modulo = c.modulos[moduloActivo - 1];
   const quiz = c.quizDe(moduloActivo);
   const ultimaDelModulo = nroEnModulo === delModulo.length;
+  const ultimaDelCurso = c.indice >= c.total - 1;
+  const evento = c.modulos.find((m) => m.evento);
 
   function irAModulo(n: number) {
     setEnQuiz(null);
@@ -90,11 +93,11 @@ export function App() {
                 role="tab"
                 aria-selected={m.numero === moduloActivo}
                 data-completo={completo ? 'si' : 'no'}
+                data-evento={m.evento ? 'si' : undefined}
+                title={m.evento ? m.titulo : `Módulo ${m.numero}: ${m.titulo}`}
                 onClick={() => irAModulo(m.numero)}
               >
-                <b>
-                  {m.numero}. {m.titulo}
-                </b>
+                <b>{m.evento ? m.corto : `${m.numero}. ${m.corto}`}</b>
                 <span>
                   {p.hechas}/{p.total}
                   {completo ? ' ✓' : ''}
@@ -123,22 +126,23 @@ export function App() {
           >
             sonido: {sonido ? 'sí' : 'no'}
           </button>
-          <input
-            className="volumen"
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={volumen}
-            disabled={!sonido}
-            aria-label={'Volumen: ' + Math.round(volumen * 100) + '%'}
-            title={'Volumen: ' + Math.round(volumen * 100) + '%'}
-            onChange={(ev) => fijarVolumen(Number(ev.target.value))}
-            // La muestra va al soltar, no en cada paso: si no, arrastrar el
-            // control dispara treinta sonidos encimados.
-            onPointerUp={() => sonarMision()}
-            onKeyUp={() => sonarMision()}
-          />
+          {sonido && (
+            <input
+              className="volumen"
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={volumen}
+              aria-label={'Volumen: ' + Math.round(volumen * 100) + '%'}
+              title={'Volumen: ' + Math.round(volumen * 100) + '%'}
+              onChange={(ev) => fijarVolumen(Number(ev.target.value))}
+              // La muestra va al soltar, no en cada paso: si no, arrastrar el
+              // control dispara treinta sonidos encimados.
+              onPointerUp={() => sonarMision()}
+              onKeyUp={() => sonarMision()}
+            />
+          )}
         </div>
       </header>
 
@@ -186,7 +190,9 @@ export function App() {
           ) : (
             <>
               <p className="eyebrow">
-                Módulo {l.modulo} · Lección {nroEnModulo} de {delModulo.length}
+                {modulo.evento
+                  ? `${modulo.titulo} · Misión ${nroEnModulo} de ${delModulo.length}`
+                  : `Módulo ${l.modulo} · Lección ${nroEnModulo} de ${delModulo.length}`}
               </p>
               <h1 className="titulo">{l.titulo}</h1>
 
@@ -244,9 +250,19 @@ export function App() {
         logro={c.logro}
         progreso={c.progreso}
         onCerrar={c.limpiarLogro}
-        etiquetaSiguiente={ultimaDelModulo && quiz ? 'Ir al cuestionario' : 'Siguiente lección'}
+        etiquetaSiguiente={
+          ultimaDelModulo && quiz ? 'Ir al cuestionario' : ultimaDelCurso ? 'Listo' : modulo.evento ? 'Siguiente misión' : 'Siguiente lección'
+        }
         onSiguiente={() => (ultimaDelModulo && quiz ? setEnQuiz(l.modulo) : c.ir(c.indice + 1))}
       />
+
+      {evento && (
+        <Noticia
+          modulo={evento}
+          {...c.progresoModulo(evento.numero)}
+          onParticipar={() => irAModulo(evento.numero)}
+        />
+      )}
     </div>
   );
 }

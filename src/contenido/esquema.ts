@@ -1,7 +1,8 @@
 // CONTRATO COMPARTIDO. No modificar sin avisar al orquestador.
 import type { Estado } from '../motor/tipos';
 
-export type NumeroModulo = 1 | 2 | 3 | 4 | 5;
+/** El 6 es el evento del dia: va aparte de la cursada y no tiene cuestionario. */
+export type NumeroModulo = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Leccion {
   /** 'm2-l5' */
@@ -17,6 +18,12 @@ export interface Leccion {
   comandoNuevo: string;
   /** Se muestra solo si el alumno la pide. Debe desbloquear sin resolver del todo. */
   pista: string;
+  /**
+   * Comandos que se corren en silencio antes de empezar, sobre el mundo limpio.
+   * No quedan en el historial. Sirve para arrancar con lo que se armo en la
+   * leccion anterior (por ejemplo ~/bin y el PATH) sin pedir que se repita.
+   */
+  preparacion?: string[];
   /** Comandos que resuelven la leccion. Alimenta la suite de pruebas. */
   solucion: string[];
   /** true cuando la leccion esta cumplida. Se evalua tras CADA comando. */
@@ -40,10 +47,20 @@ export interface Quiz {
 export interface Modulo {
   numero: NumeroModulo;
   titulo: string;
+  /** Una o dos palabras para la pestaña. Con el titulo entero, en 720p las pestañas se partian en cuatro lineas. */
+  corto: string;
   /** 2-3 oraciones: que se lleva el alumno de este modulo. */
   introduccion: string;
   /** Se muestra al completar todas las lecciones y el quiz. */
   cierre: string;
+  /** Solo el evento del dia: lo que dice el pop-up de noticias al entrar. */
+  evento?: {
+    titular: string;
+    bajada: string;
+    /** Fechas 'AAAA-MM-DD', las dos inclusive. Fuera de ese rango no se ve. */
+    desde: string;
+    hasta: string;
+  };
 }
 
 /** Helper para validadores: la ruta absoluta actual del alumno. */

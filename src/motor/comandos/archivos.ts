@@ -177,6 +177,11 @@ export const cp: Comando = (ctx) => {
   if (origenes.length > 1 && !destinoEsDir) {
     return falla(`cp: destino «${destino}» no es un directorio`);
   }
+  // La barra final promete una carpeta. Si no existe, GNU falla en vez de
+  // crear un archivo con ese nombre (cp -r si la crea: copia la carpeta entera).
+  if (destino.endsWith('/') && !destinoEsDir && !recursivo) {
+    return falla(`cp: no se puede crear «${destino}»: No existe el directorio`);
+  }
   const errores: string[] = [];
   for (const origen of origenes) {
     const segsOrigen = resolver(origen, ctx.estado);
@@ -352,10 +357,23 @@ export const find: Comando = (ctx) => {
 export const chmod: Comando = (ctx) => {
   if (!ctx.args.length) return falla('chmod: falta un operando');
   const [modoArg, ...archivos] = ctx.args;
-  if (!/^[0-7]{3}$/.test(modoArg)) {
-    return falla(`chmod: modo invalido: «${modoArg}»: este simulador solo admite notacion octal de 3 digitos (ej: chmod 754 archivo.txt), no notacion simbolica como u+x`);
+  // Octal (755) o simbolico (+x, u+x, go-w, a=r). Con +x a secas, como en GNU, es para todos.
+  const simb = modoArg.match(/^([ugoa]*)([+=-])([rwx]+)$/);
+  if (!/^[0-7]{3}$/.test(modoArg) && !simb) {
+    return falla(`chmod: modo invalido: «${modoArg}»: probá con octal (chmod 755 archivo) o simbólico (chmod +x archivo)`);
   }
-  const modo = parseInt(modoArg, 8);
+  const nuevoModo = (previo: number): number => {
+    if (!simb) return parseInt(modoArg, 8);
+    const quien = simb[1].replace('a', 'ugo') || 'ugo';
+    const bits = (simb[3].includes('r') ? 4 : 0) | (simb[3].includes('w') ? 2 : 0) | (simb[3].includes('x') ? 1 : 0);
+    let m = previo;
+    for (const [letra, corr] of [['u', 6], ['g', 3], ['o', 0]] as const) {
+      if (!quien.includes(letra)) continue;
+      if (simb[2] === '=') m &= ~(7 << corr);
+      m = simb[2] === '-' ? m & ~(bits << corr) : m | (bits << corr);
+    }
+    return m;
+  };
   const errores: string[] = [];
   for (const ruta of archivos) {
     const n = buscarRuta(ruta, ctx.estado);
@@ -363,7 +381,7 @@ export const chmod: Comando = (ctx) => {
       errores.push(`chmod: no se puede acceder a «${ruta}»: No existe el archivo o el directorio`);
       continue;
     }
-    n.modo = modo;
+    n.modo = nuevoModo(n.modo);
   }
   return errores.length ? falla(errores.join('\n')) : ok();
 };

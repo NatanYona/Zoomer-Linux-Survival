@@ -13,6 +13,7 @@ import { analizarCrontab } from '../motor/cron';
 export const MODULO5: Modulo = {
   numero: 5,
   titulo: 'Scripts y automatización',
+  corto: 'Scripts',
   introduccion:
     'Hasta acá escribiste cada comando a mano. En este módulo los guardás en un archivo y los convertís en un programa: un script. Vas a usar variables, recibir datos, tomar decisiones con if, repetir con for, ordenar el código en funciones y, al final, dejar una tarea programada para que el sistema la ejecute solo.',
   cierre:

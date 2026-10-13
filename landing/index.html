@@ -157,6 +157,28 @@ h2{font-size:clamp(2rem,5.5vw,3.6rem);font-weight:800;letter-spacing:-.035em;lin
 .rango--top{background:var(--acido);color:var(--negro)}
 .rango--top span{color:rgba(8,9,11,.65)}
 
+/* ---------- eventos ---------- */
+.evento{margin-top:3rem;border:1px solid var(--borde);border-top:4px solid var(--rosa);background:var(--negro)}
+.evento__kicker{
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1rem;margin:0;
+  padding:.9rem 1.8rem;border-bottom:1px solid var(--borde);
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tenue);
+}
+.evento__kicker b{color:var(--rosa);font-weight:600}
+.evento__cuerpo{padding:1.8rem}
+.evento h3{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.03em;line-height:1;margin:0 0 .9rem}
+.evento__bajada{margin:0;max-width:40rem;color:var(--tenue);font-size:1rem}
+.evento__arco{display:grid;gap:1px;margin-top:1.6rem;background:var(--borde);border:1px solid var(--borde)}
+@media(min-width:52rem){.evento__arco{grid-template-columns:repeat(2,1fr)}}
+.evento__tramo{background:var(--negro);padding:1.2rem 1.4rem}
+.evento__tramo p{margin:0;color:var(--tenue);font-size:.92rem}
+.evento__tramo p+p{margin-top:.7rem}
+.evento__tramo .mod__n{color:var(--rosa)}
+.evento code{
+  font-family:var(--mono);font-size:.78rem;color:var(--cian);
+  background:var(--humo);padding:.12em .45em;border:1px solid var(--borde);
+}
+
 /* ---------- quien hizo esto ---------- */
 .autor{display:grid;gap:2rem;margin-top:3rem;grid-template-columns:1fr}
 @media(min-width:56rem){.autor{grid-template-columns:16rem 1fr;gap:3rem}}
@@ -253,7 +275,7 @@ html.js .rev.visible{opacity:1;transform:none}
     <div class="cifras rev">
       <div class="cifra"><b>5</b><span>módulos</span></div>
       <div class="cifra"><b>40</b><span>lecciones</span></div>
-      <div class="cifra"><b>43</b><span>comandos</span></div>
+      <div class="cifra"><b>58</b><span>comandos</span></div>
       <div class="cifra"><b>0</b><span>instalación</span></div>
     </div>
   </div>
@@ -304,9 +326,45 @@ html.js .rev.visible{opacity:1;transform:none}
   </div>
 </section>
 
+<section id="eventos">
+  <div class="env">
+    <p class="rotulo rev">03 — eventos</p>
+    <h2 class="rev">Una semana.<br />Un taller.</h2>
+    <p class="parrafo rev">
+      Además de los módulos, el curso tiene <b style="color:var(--tinta)">eventos</b>: talleres que
+      duran una semana. Cuando hay uno, al entrar te aparece una noticia y una pestaña nueva con
+      misiones, su propio cuestionario y una historia que las une. El evento se va al terminar la
+      semana, pero el XP que ganaste se queda.
+    </p>
+
+    <article class="evento rev">
+      <p class="evento__kicker"><b>Evento · octubre 2026</b><span>11 misiones · 1 cuestionario</span></p>
+      <div class="evento__cuerpo">
+        <h3>Operación Atajo</h3>
+        <p class="evento__bajada">
+          El sysadmin del laboratorio se fue de vacaciones y dejó todo hecho a mano. Hay que
+          automatizarlo antes de que vuelva.
+        </p>
+        <div class="evento__arco">
+          <div class="evento__tramo">
+            <p class="mod__n">MISIONES 1 A 6 · HERRAMIENTAS</p>
+            <p>Atajos que sobreviven a la terminal, dónde busca bash los comandos, un script convertido en comando propio y una tarea que corre sola.</p>
+            <p><code>alias</code> <code>source</code> <code>$PATH</code> <code>which</code> <code>~/bin</code> <code>crontab</code></p>
+          </div>
+          <div class="evento__tramo">
+            <p class="mod__n">MISIONES 7 A 11 · SCRIPTS QUE DECIDEN</p>
+            <p>Revisar antes de actuar, quejarse bien si te usan mal, un semáforo para el log y un reporte de notas que lee un archivo línea por línea.</p>
+            <p><code>if</code> <code>elif</code> <code>exit 1</code> <code>&amp;&amp;</code> <code>||</code> <code>while read</code></p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
 <section>
   <div class="env">
-    <p class="rotulo rev">03 — el pase</p>
+    <p class="rotulo rev">04 — el pase</p>
     <h2 class="rev">Juntás XP.<br />Te ganás el <span style="color:var(--acido)">#</span></h2>
     <p class="parrafo rev">
       Cada lección suma puntos, y más si la resolvés sin abrir la pista. Los puntos desbloquean
@@ -330,7 +388,7 @@ html.js .rev.visible{opacity:1;transform:none}
 
 <section id="quien">
   <div class="env">
-    <p class="rotulo rev">04 — quién hizo esto</p>
+    <p class="rotulo rev">05 — quién hizo esto</p>
     <h2 class="rev">Un ayudante de cátedra<br />cansado de perder gente<br />en el módulo 2.</h2>
 
     <div class="autor rev">
@@ -370,7 +428,7 @@ html.js .rev.visible{opacity:1;transform:none}
 
 <section class="cierre" id="empezar">
   <div class="env">
-    <p class="rotulo rev">05 — dale</p>
+    <p class="rotulo rev">06 — dale</p>
     <h2 class="rev">Abrí la<br />terminal.</h2>
     <p class="parrafo rev" style="margin-inline:auto">
       Gratis, en español, sin cuenta y sin instalar nada. Cerrás la pestaña y el progreso

@@ -6,6 +6,7 @@ import { buscarRuta, esDir } from '../motor/vfs';
 export const MODULO2: Modulo = {
   numero: 2,
   titulo: 'Archivos, permisos y grupos',
+  corto: 'Permisos',
   introduccion:
     'En este modulo dejas de mirar el sistema de archivos desde afuera y empezas a moverlo: copias, borras, y aprendes a leer y cambiar quien puede tocar que. Tambien vas a entender por que en Linux cada archivo tiene un dueno y un grupo, y que significa eso en la practica.',
   cierre:

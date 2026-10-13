@@ -50,6 +50,8 @@ export interface Entorno {
   vars: Record<string, string>;
   funciones: Record<string, unknown>;
   ultimo?: number;           // $?
+  /** alias ll='ls -la': nombre -> texto que lo reemplaza */
+  alias?: Record<string, string>;
 }
 
 /** Lo que devuelve `nano` o `crontab -e`: la UI abre el editor con esto. */

@@ -287,11 +287,14 @@ export const wc: Comando = (ctx) => {
   const archivos = ctx.args.filter((a) => !a.startsWith('-'));
 
   const fila = (c: { lineas: number; palabras: number; bytes: number }, nombre?: string): string => {
-    const campos: string[] = [];
-    if (todas || mostrarL) campos.push(String(c.lineas).padStart(7));
-    if (todas || mostrarW) campos.push(String(c.palabras).padStart(7));
-    if (todas || mostrarC) campos.push(String(c.bytes).padStart(7));
-    return campos.join('') + (nombre ? ` ${nombre}` : '');
+    const campos: number[] = [];
+    if (todas || mostrarL) campos.push(c.lineas);
+    if (todas || mostrarW) campos.push(c.palabras);
+    if (todas || mostrarC) campos.push(c.bytes);
+    // Como GNU: con un solo numero no hay columnas que alinear, sale pelado.
+    // Asi n=$(... | wc -l) guarda "3" y no "      3".
+    const texto = campos.length === 1 && archivos.length < 2 ? String(campos[0]) : campos.map((x) => String(x).padStart(7)).join('');
+    return texto + (nombre ? ` ${nombre}` : '');
   };
 
   if (!archivos.length) return ok(fila(contarTexto(ctx.entrada)) + '\n');
@@ -379,6 +382,9 @@ const AYUDA = [
   '',
   'Scripts y tareas programadas:',
   '  nano bash read test crontab sleep',
+  '',
+  'Atajos y PATH:',
+  '  alias unalias type which export source',
   '',
   'Usuario y sistema:',
   '  whoami id groups who date du df history clear man help',

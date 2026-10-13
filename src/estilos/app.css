@@ -26,9 +26,11 @@
 
 .tab {
   appearance: none; background: none; border: 0; cursor: pointer;
-  padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) - 2px);
+  padding: var(--sp-3) var(--sp-3) calc(var(--sp-3) - 2px);
   border-bottom: 2px solid transparent;
   display: flex; flex-direction: column; gap: 2px; align-items: flex-start;
+  /* Una sola linea: si no entran, la tira se desliza (ver .modulos). */
+  white-space: nowrap; flex: 0 0 auto;
   font-family: inherit; color: var(--texto-suave);
   transition: color 0.12s, border-color 0.12s;
 }
@@ -40,6 +42,14 @@
   color: var(--texto-tenue); font-variant-numeric: tabular-nums;
 }
 .tab[data-completo="si"] span { color: var(--exito); }
+/* El evento se distingue de la cursada: acento y un sello "hoy". */
+.tab[data-evento="si"] b { color: var(--acento); display: flex; align-items: center; gap: var(--sp-2); }
+.tab[data-evento="si"] b::after {
+  content: 'hoy'; font-family: var(--tipo-mono); font-size: 0.625rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;
+  padding: 2px 5px; border-radius: var(--radio);
+  background: var(--acento-vivo); color: #17130a;
+}
 
 .ajustes { display: flex; align-items: center; gap: var(--sp-2); align-self: center; }
 
@@ -63,7 +73,7 @@
 .tema:hover { border-color: var(--borde-fuerte); color: var(--texto); }
 
 /* ---------- cuerpo ---------- */
-.cuerpo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); min-height: 0; }
+.cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
 
 .panel {
   overflow-y: auto; padding: var(--sp-6) var(--sp-6) var(--sp-8);
@@ -426,4 +436,52 @@ details.pista .prosa { margin-top: var(--sp-3); font-size: var(--esc-base); }
     margin: 0 calc(-1 * var(--sp-5)); padding: 0 var(--sp-5);
   }
   .tab { flex: 0 0 auto; max-width: 12rem; }
+}
+
+/* ---------- pantallas bajas (720p del laboratorio) ----------
+   Con 1280x720 y la barra del navegador quedan ~600px de alto. A tamaño
+   completo la consigna caia debajo del borde y habia que scrollear para
+   saber que hacer. Se achica el aire, no la letra de la terminal. */
+@media (max-height: 820px) and (min-width: 901px) {
+  .marca { padding-block: var(--sp-2); }
+  .tab { padding-block: var(--sp-2) calc(var(--sp-2) - 2px); }
+  .panel { padding: var(--sp-5) var(--sp-5) var(--sp-6); gap: var(--sp-4); }
+  .titulo { font-size: var(--esc-lg); }
+  .prosa { font-size: var(--esc-base); line-height: 1.55; }
+  .consigna { padding: var(--sp-3) var(--sp-4); }
+}
+
+/* ---------- noticia del evento del dia ---------- */
+.noticia {
+  margin: auto; /* el reset global le saca el margin:auto que lo centra */
+  inline-size: min(30rem, calc(100vw - 2 * var(--sp-4)));
+  max-block-size: calc(100dvh - 2 * var(--sp-4)); overflow-y: auto;
+  padding: var(--sp-5) var(--sp-6) var(--sp-6);
+  background: var(--fondo-elev); color: var(--texto);
+  border: 1px solid var(--borde-fuerte); border-top: 4px solid var(--acento-vivo);
+  border-radius: var(--radio-lg); box-shadow: var(--sombra);
+}
+.noticia[open] { animation: aviso-entra 0.22s ease; }
+.noticia::backdrop { background: rgba(10, 14, 17, 0.55); }
+.noticia__kicker {
+  display: flex; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap;
+  margin: 0 0 var(--sp-4); padding-block-end: var(--sp-2); border-bottom: 1px solid var(--borde);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); color: var(--texto-tenue);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.noticia__sello {
+  display: inline-block; margin: 0 0 var(--sp-2); padding: 2px var(--sp-2);
+  font-family: var(--tipo-mono); font-size: var(--esc-xs); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--acento-tenue); color: var(--acento); border-radius: var(--radio);
+}
+.noticia__titular {
+  margin: 0 0 var(--sp-3); font-family: var(--tipo-prosa); font-size: var(--esc-xxl);
+  font-weight: 600; line-height: 1.1; text-wrap: balance;
+}
+.noticia__bajada { margin: 0 0 var(--sp-4); font-family: var(--tipo-prosa); font-size: var(--esc-md); line-height: 1.5; color: var(--texto-suave); }
+.noticia__progreso { margin: 0 0 var(--sp-4); font-family: var(--tipo-mono); font-size: var(--esc-sm); color: var(--acento); }
+.noticia__acciones { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .noticia[open] { animation: none; }
 }

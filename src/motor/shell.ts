@@ -7,7 +7,9 @@
 //  - tuberias |, listas ; && ||, negacion !, redirecciones > >> < 2> 2>&1 &> >&2
 //  - if/elif/else/fi, for/in/do/done, while/until, { ...; }, funciones
 //  - builtins: test/[ ], [[ ]], read, exit, return, local, break, continue,
-//    true, false, :, export, unset, bash/sh, source/., printf
+//    true, false, :, export, unset, bash/sh, source/., printf,
+//    alias/unalias, type, which
+//  - buscar comandos en las carpetas del PATH (~/bin, por ejemplo)
 //  - ejecutar scripts (./x.sh, ~/x.sh, bash x.sh) respetando los permisos
 //
 // Lo que NO soporta a proposito: subshells ( ), (( )), heredocs <<, case,
@@ -558,6 +560,8 @@ interface Sesion {
   enBucle: number;
   /** linea del script que se esta ejecutando */
   linea: number;
+  /** alias que se estan expandiendo: alias ls='ls -la' no se vuelve a expandir */
+  enAlias?: Set<string>;
 }
 
 const MAX_PASOS = 5000;
@@ -1085,6 +1089,68 @@ const BUILTINS: Record<string, Builtin> = {
     return 0;
   },
 
+  alias: (a, s, sum) => {
+    const tabla = (s.e.entorno ??= { vars: {}, funciones: {} }).alias ??= {};
+    const mostrar = (n: string) => `alias ${n}='${tabla[n]}'\n`;
+    if (!a.length) {
+      sum.o += Object.keys(tabla).sort().map(mostrar).join('');
+      return 0;
+    }
+    // alias ll = ls: el error de siempre, igual que con las variables
+    if (a.some((x) => x.startsWith('=')) && !a.some((x) => x.indexOf('=') > 0)) {
+      throw new Abortar(`alias: alrededor del = no van espacios. Va todo junto: alias ${a[0]}='${a.slice(1).join(' ').replace(/^=\s*/, '')}'`);
+    }
+    let codigo = 0;
+    for (const x of a) {
+      const eq = x.indexOf('=');
+      if (eq > 0) tabla[x.slice(0, eq)] = x.slice(eq + 1);
+      else if (x in tabla) sum.o += mostrar(x);
+      else {
+        escribirErr(sum, `bash: alias: ${x}: no encontrado\n`);
+        codigo = 1;
+      }
+    }
+    return codigo;
+  },
+  unalias: (a, s, sum) => {
+    const tabla = s.e.entorno?.alias ?? {};
+    let codigo = 0;
+    for (const x of a) {
+      if (x in tabla) delete tabla[x];
+      else {
+        escribirErr(sum, `bash: unalias: ${x}: no encontrado\n`);
+        codigo = 1;
+      }
+    }
+    return codigo;
+  },
+  type: (a, s, sum) => {
+    let codigo = 0;
+    for (const x of a) {
+      const al = s.e.entorno?.alias?.[x];
+      const ruta = al === undefined && !s.funciones[x] && !BUILTINS[x] ? dondeEsta(x, s) : null;
+      if (al !== undefined) sum.o += `${x} es un alias de «${al}»\n`;
+      else if (s.funciones[x]) sum.o += `${x} es una función\n`;
+      else if (BUILTINS[x] || (INTERNAS.has(x) && REGISTRO[x])) sum.o += `${x} es una orden interna del shell\n`;
+      else if (ruta) sum.o += `${x} es ${ruta}\n`;
+      else {
+        escribirErr(sum, `bash: type: ${x}: no se encontró\n`);
+        codigo = 1;
+      }
+    }
+    return codigo;
+  },
+  // En Linux which es un programa aparte: no conoce alias ni funciones, solo el PATH.
+  which: (a, s, sum) => {
+    let codigo = 0;
+    for (const x of a) {
+      const ruta = dondeEsta(x, s);
+      if (ruta) sum.o += ruta + '\n';
+      else codigo = 1;
+    }
+    return codigo;
+  },
+
   bash: (a, s, sum, ent) => {
     const args = a.filter((x) => x !== '-x' && x !== '-e');
     if (!args.length) {
@@ -1121,7 +1187,50 @@ BUILTINS.sh = BUILTINS.bash;
 BUILTINS['.'] = BUILTINS.source;
 
 /** Nombres que el autocompletado tiene que conocer ademas del registro. */
-export const NOMBRES_BUILTINS = ['bash', 'sh', 'read', 'test', 'exit', 'source', 'printf', 'export', 'unset', 'local', 'return', 'true', 'false'];
+export const NOMBRES_BUILTINS = ['bash', 'sh', 'read', 'test', 'exit', 'source', 'printf', 'export', 'unset', 'local', 'return', 'true', 'false', 'alias', 'unalias', 'type', 'which'];
+
+// ---------- PATH
+
+/** Carpetas del PATH, en orden. */
+function carpetasPath(s: Sesion): string[] {
+  // ponytail: bash expande el ~ al hacer la asignacion; aca se expande al buscar,
+  // asi `export PATH=$PATH:~/bin` anda igual aunque `echo $PATH` muestre el ~.
+  return (leerVar(s, 'PATH') ?? '').split(':').filter(Boolean).map((d) => d.replace(/^~(?=\/|$)/, HOME).replace(/\/$/, ''));
+}
+
+/** Primer ejecutable con ese nombre en las carpetas del PATH, como hace bash. */
+function buscarEnPath(cmd: string, s: Sesion): string | null {
+  for (const dir of carpetasPath(s)) {
+    const n = buscarRuta(dir + '/' + cmd, s.e);
+    if (n && n.tipo === 'arch' && puede(n, 'x', s.e)) return dir + '/' + cmd;
+  }
+  return null;
+}
+
+/** En bash de verdad estos viven adentro del shell, no en un archivo. */
+const SOLO_INTERNAS = new Set(['cd', 'history', 'help']);
+const INTERNAS = new Set([...SOLO_INTERNAS, 'echo', 'pwd', 'kill']);
+
+/**
+ * Los comandos del simulador hacen de cuenta que viven en /usr/bin. Si el
+ * alumno pisa el PATH sin esas carpetas (PATH=~/bin), se quedan sin ls,
+ * como en una terminal de verdad.
+ */
+function delSistema(cmd: string, s: Sesion): boolean {
+  if (!REGISTRO[cmd]) return false;
+  if (SOLO_INTERNAS.has(cmd)) return true;
+  return carpetasPath(s).some((d) => d === '/usr/bin' || d === '/bin');
+}
+
+/** Ruta del programa que correria `cmd`, o null. */
+function dondeEsta(cmd: string, s: Sesion): string | null {
+  if (cmd.includes('/')) {
+    const n = buscarRuta(cmd, s.e);
+    return n && n.tipo === 'arch' && puede(n, 'x', s.e) ? cmd : null;
+  }
+  if (SOLO_INTERNAS.has(cmd)) return null;
+  return delSistema(cmd, s) ? '/usr/bin/' + cmd : buscarEnPath(cmd, s);
+}
 
 // ---------- scripts
 
@@ -1430,6 +1539,24 @@ function llamarFuncion(nombre: string, args: string[], s: Sesion, sum: Sumidero,
   }
 }
 
+/** Reemplaza el alias por su texto y corre la linea resultante, con los argumentos al final. */
+function correrAlias(nombre: string, texto: string, args: string[], s: Sesion, sum: Sumidero, ent: Entrada): number {
+  const citar = (x: string) => "'" + x.replace(/'/g, `'\\''`) + "'";
+  let arbol: Nodo;
+  try {
+    arbol = analizar([texto, ...args.map(citar)].join(' '));
+  } catch (err) {
+    if (err instanceof ErrorSintaxis) throw new Abortar(`${nombre}: el alias tiene un error: ${err.message}`);
+    throw err;
+  }
+  (s.enAlias ??= new Set()).add(nombre);
+  try {
+    return correrNodo(arbol, s, sum, ent);
+  } finally {
+    s.enAlias.delete(nombre);
+  }
+}
+
 function correrSimple(n: Nodo & { k: 'simple' }, s: Sesion, sum: Sumidero, ent: Entrada): number {
   paso(s);
   s.linea = n.linea;
@@ -1444,22 +1571,29 @@ function correrSimple(n: Nodo & { k: 'simple' }, s: Sesion, sum: Sumidero, ent: 
   for (const [nombre, valor] of n.asig) fijarVar(s, nombre, expandirUna(valor, s, sum));
 
   const [cmd, ...args] = argv;
+  // Los alias son cosa de la terminal: dentro de un script no se expanden.
+  const alias = s.profundidad === 0 && !s.enAlias?.has(cmd) ? s.e.entorno?.alias?.[cmd] : undefined;
   return conRedirs(n.redirs, s, sum, ent, (sm, en) => {
+    if (alias !== undefined) return correrAlias(cmd, alias, args, s, sm, en);
     if (s.funciones[cmd]) return llamarFuncion(cmd, args, s, sm, en);
     const b = BUILTINS[cmd];
     if (b) return b(args, s, sm, en);
     if (cmd.includes('/')) return correrScript(cmd, args, s, sm, en, 'directo');
-    const comando = REGISTRO[cmd];
+    const comando = delSistema(cmd, s) ? REGISTRO[cmd] : undefined;
     if (!comando) {
+      const enPath = buscarEnPath(cmd, s);
+      if (enPath) return correrScript(enPath, args, s, sm, en, 'directo');
       const donde = s.script ? `${s.script}: línea ${n.linea}` : 'bash';
       let msg = `${donde}: ${cmd}: orden no encontrada`;
+      const sinX = carpetasPath(s).map((d) => d + '/' + cmd).find((r) => buscarRuta(r, s.e)?.tipo === 'arch');
       if (args[0] === '=' || args[0]?.startsWith('=')) {
         msg += `\n(¿querías guardar una variable? Va todo junto, sin espacios: ${cmd}=valor)`;
       } else if (cmd.startsWith('[') && cmd !== '[') {
         msg += '\n(después de [ va un espacio, y antes de ] también. Por ejemplo: [ $x -eq 1 ])';
-      } else if (/\.sh$/.test(cmd)) {
-        const existe = buscarRuta(cmd, s.e);
-        if (existe) msg += `\n(para ejecutar un archivo de la carpeta actual escribí ./${cmd})`;
+      } else if (sinX) {
+        msg += `\n(${sinX} existe pero le falta el permiso de ejecución: chmod 755 ${sinX})`;
+      } else if (buscarRuta(cmd, s.e)?.tipo === 'arch') {
+        msg += `\n(está en la carpeta actual, pero bash solo busca comandos en las carpetas del PATH. Escribí ./${cmd})`;
       }
       escribirErr(sm, msg + '\n');
       return 127;

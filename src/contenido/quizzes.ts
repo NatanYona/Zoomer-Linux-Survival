@@ -334,4 +334,72 @@ export const QUIZZES: Quiz[] = [
       },
     ],
   },
+  {
+    // Evento del dia: Operacion Atajo.
+    modulo: 6,
+    preguntas: [
+      {
+        enunciado: 'Creaste alias ll=\'ls -la\' en la terminal. Cerrás la terminal, abrís una nueva y escribís ll. ¿Qué pasa?',
+        opciones: [
+          'Funciona: los alias se guardan solos',
+          'orden no encontrada: el alias vivía en la terminal que cerraste',
+          'Corre ls sin el -la',
+          'Pide confirmación para volver a crearlo',
+        ],
+        correcta: 1,
+        explicacion:
+          'Un alias dura lo que dura la terminal. Para que esté siempre hay que guardarlo en ~/.bash_aliases (o en ~/.bashrc), que bash lee cada vez que arranca.',
+      },
+      {
+        enunciado: 'Tenés un script ejecutable en ~/bin/saludar, pero al escribir saludar aparece "orden no encontrada". ¿Qué falta?',
+        opciones: [
+          'Ponerle .sh al final del nombre',
+          'Correrlo con sudo',
+          'Que ~/bin esté en el PATH: export PATH="$PATH:$HOME/bin"',
+          'Moverlo a la carpeta actual',
+        ],
+        correcta: 2,
+        explicacion:
+          'Bash busca los comandos solo en las carpetas del PATH. El $PATH del principio conserva las carpetas que ya estaban: sin él, te quedarías sin ls ni cat.',
+      },
+      {
+        enunciado: 'En el crontab pusiste "0 18 * * 1-5 respaldar" y el respaldo nunca corre, aunque en tu terminal anda perfecto. ¿Por qué?',
+        opciones: [
+          'Cron no tiene tu PATH: el comando tiene que ir con ruta absoluta',
+          'Cron no puede correr scripts propios',
+          'Falta escribir bash adelante',
+          'El 1-5 está mal escrito',
+        ],
+        correcta: 0,
+        explicacion:
+          'Cron arranca con un PATH mínimo y no lee tu .bashrc, así que no conoce ~/bin. Con /home/alumno/bin/respaldar lo encuentra. Lo peor es que falla en silencio.',
+      },
+      {
+        enunciado: 'Corrés respaldar && echo "OK" || echo "FALLÓ". El script muestra "Uso: respaldar carpeta" pero no tiene exit 1. ¿Qué se imprime después?',
+        opciones: ['FALLÓ', 'Nada', 'Las dos: OK y FALLÓ', 'OK'],
+        correcta: 3,
+        explicacion:
+          'Sin exit 1, el script termina con el código del último comando, el echo, que salió bien (0). Para && eso es éxito, así que imprime OK. Por eso un script tiene que avisar el error con su código de salida, no solo con un mensaje.',
+      },
+      {
+        enunciado: 'errores vale 2. ¿Qué imprime este bloque? if [ $errores -gt 3 ]; then echo rojo; elif [ $errores -gt 0 ]; then echo amarillo; else echo verde; fi',
+        opciones: ['rojo', 'amarillo', 'amarillo y verde', 'verde'],
+        correcta: 1,
+        explicacion:
+          '2 no es mayor que 3, así que no entra en el if. Sí es mayor que 0: entra en el elif e imprime amarillo. Bash entra solo en la primera condición que se cumple, así que el else ni se mira.',
+      },
+      {
+        enunciado: '¿Qué hace while read nombre nota; do ... done < notas.txt?',
+        opciones: [
+          'Lee solo la primera línea de notas.txt',
+          'Le pide al usuario que escriba un nombre y una nota',
+          'Recorre notas.txt línea por línea: la primera palabra va a nombre y el resto a nota',
+          'Borra notas.txt a medida que lo lee',
+        ],
+        correcta: 2,
+        explicacion:
+          'El < notas.txt le da el archivo como entrada al while. En cada vuelta read toma una línea y la reparte entre las variables; cuando no quedan líneas, el bucle termina.',
+      },
+    ],
+  },
 ];

@@ -6,6 +6,7 @@ import { buscarRuta, esDir } from '../motor/vfs';
 export const MODULO4: Modulo = {
   numero: 4,
   titulo: 'Procesos, disco y tuberías',
+  corto: 'Procesos',
   introduccion:
     'En este modulo trabajas con arboles completos de archivos, no con archivos sueltos: copiarlos, borrarlos, y entender cuanto espacio ocupan de verdad. Tambien abris la tapa del sistema para ver que procesos estan corriendo, aprendes a terminarlos cuando hace falta, y descubris la idea que sostiene a todo Unix: comandos chicos que se encadenan entre si.',
   cierre:

@@ -3,14 +3,15 @@
 // escribio una consigna imposible, un validador mal apuntado o uso un comando
 // que nadie implemento, falla aca y no en el aula.
 import { describe, it, expect } from 'vitest';
-import { ejecutar, nuevoEstado } from '../src/motor/motor';
+import { ejecutar, mundoPara } from '../src/motor/motor';
 import { LECCIONES, MODULOS, QUIZZES, leccionesDe } from '../src/contenido';
 
-const ESPERADAS: Record<number, number> = { 1: 7, 2: 8, 3: 9, 4: 7, 5: 9 };
+const ESPERADAS: Record<number, number> = { 1: 7, 2: 8, 3: 9, 4: 7, 5: 9, 6: 11 };
 
 describe('estructura del curso', () => {
-  it('tiene los 5 modulos', () => {
-    expect(MODULOS.map((m) => m.numero)).toEqual([1, 2, 3, 4, 5]);
+  it('tiene los 5 modulos y el evento del dia', () => {
+    expect(MODULOS.map((m) => m.numero)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(MODULOS.filter((m) => m.evento).map((m) => m.numero)).toEqual([6]);
   });
 
   it('tiene la cantidad de lecciones de cada modulo', () => {
@@ -33,8 +34,8 @@ describe('estructura del curso', () => {
     }
   });
 
-  it('tiene un quiz por modulo, con 6 preguntas y respuesta correcta en rango', () => {
-    expect(QUIZZES.length).toBe(MODULOS.length);
+  it('tiene un quiz por modulo (el evento tambien), con 6 preguntas y respuesta correcta en rango', () => {
+    expect(QUIZZES.map((q) => q.modulo)).toEqual(MODULOS.map((m) => m.numero));
     for (const q of QUIZZES) {
       expect(q.preguntas.length, 'quiz ' + q.modulo).toBe(6);
       for (const p of q.preguntas) {
@@ -49,7 +50,7 @@ describe('estructura del curso', () => {
 describe('cada leccion es resoluble', () => {
   for (const l of LECCIONES) {
     it(l.id + ' - ' + l.titulo, () => {
-      const e = nuevoEstado();
+      const e = mundoPara(l.preparacion);
       const fallos: string[] = [];
       for (const cmd of l.solucion) {
         const r = ejecutar(cmd, e);
@@ -64,7 +65,7 @@ describe('cada leccion es resoluble', () => {
 describe('los validadores no se satisfacen solos', () => {
   for (const l of LECCIONES) {
     it(l.id + ' arranca sin cumplir', () => {
-      expect(l.validar(nuevoEstado()), 'la leccion nace ya cumplida').toBe(false);
+      expect(l.validar(mundoPara(l.preparacion)), 'la leccion nace ya cumplida').toBe(false);
     });
   }
 });
